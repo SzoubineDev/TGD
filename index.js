@@ -29,7 +29,7 @@ themeToggle.addEventListener('click', function () {
 
 // Active Navigation Highlighter
 function highlightActiveNav() {
-  const currentPage = window.location.pathname.split('/').pop();
+  const currentPage = window.location.pathname.split('/').pop() || 'index';
   const allNavItems = document.querySelectorAll('nav a');
 
   allNavItems.forEach(item => {
@@ -54,14 +54,17 @@ function highlightActiveNav() {
 
   allNavItems.forEach(item => {
     const href = item.getAttribute('href');
+    // Extract page name from href (handle both .html and clean URLs)
+    const hrefPage = href ? href.replace('.html', '') : '';
+
     if (
-      (currentPage === 'index.html' || currentPage === '' || currentPage === '/') &&
-      href === 'index.html'
+      (currentPage === 'index' || currentPage === '' || currentPage === '/') &&
+      (hrefPage === 'index' || hrefPage === '')
     ) {
       applyActiveStyles(item);
       return;
     }
-    if (href === currentPage) {
+    if (hrefPage === currentPage) {
       applyActiveStyles(item);
     }
   });
@@ -768,28 +771,27 @@ class LanguageManager {
   }
 
   getCurrentPage() {
-    // Get the full path and normalize it
     const fullPath = window.location.pathname;
-    const page = fullPath.split('/').pop() || 'index.html';
+    const page = fullPath.split('/').pop() || 'index';
 
     console.log('🔍 Current path analysis:');
     console.log('- Full path:', fullPath);
     console.log('- Extracted page:', page);
 
-    // Handle different page naming patterns
-    if (page === 'index.html' || page === '' || page === '/') {
+    // Handle clean URLs (without .html extension)
+    if (page === 'index' || page === '' || page === '/') {
       console.log('✅ Detected: Home page');
       return 'home';
     }
-    if (page === 'about.html') {
+    if (page === 'about') {
       console.log('✅ Detected: About page');
       return 'about';
     }
-    if (page === 'team.html') {
+    if (page === 'team') {
       console.log('✅ Detected: Team page');
       return 'team';
     }
-    if (page === 'latestEvents.html') {
+    if (page === 'latestevent' || page === 'latestEvents') {
       console.log('✅ Detected: Latest Events page');
       return 'latestEvents';
     }
