@@ -3,32 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>About Us - The Great Debaters FST Errachidia</title>
+    <title>About - The Great Debaters</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    <link rel="stylesheet" href="style.css" />
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              primary: '#660c1b',
-              primaryLight: '#8a1225',
-              primaryDark: '#4a0913',
-              secondary: '#d4af37',
-              accent: '#a52a2a',
-              olive: '#1C1C1C',
-            },
-          },
-        },
-      };
-    </script>
+    <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body class="bg-white dark:bg-gray-900 transition-colors duration-300">
+    <!-- Navbar -->
     <nav class="bg-white dark:bg-olive shadow-md sticky top-0 z-50 transition-colors duration-300">
       <div class="container mx-auto px-4">
         <div class="flex justify-between items-center py-4">
@@ -79,7 +63,6 @@
                 <span class="lang-text" id="current-lang">EN</span>
                 <i class="fas fa-chevron-down text-xs"></i>
               </button>
-
               <div class="lang-dropdown" id="lang-dropdown">
                 <div class="lang-option" data-lang="en">
                   <span class="lang-flag">🇺🇸</span>
@@ -97,10 +80,11 @@
             </div>
 
             <!-- Dark/Light Mode Toggle -->
-            <button id="theme-toggle" class="p-2 rounded-full" aria-label="Toggle dark mode">
+            <button
+              id="theme-toggle"
+              class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+            >
               <i class="fas fa-moon" id="theme-icon"></i>
-              <i class="fas fa-sun" style="display: none"></i>
-              <span class="tooltip">Switch to Dark</span>
             </button>
 
             <!-- Mobile Menu Button -->
@@ -142,6 +126,7 @@
         </div>
       </div>
     </nav>
+
     <!-- Hero Section -->
     <section class="gradient-bg py-20 text-white transition-colors duration-300">
       <div class="container mx-auto px-4 text-center">
@@ -526,29 +511,37 @@
       <div class="container mx-auto px-4">
         <div class="flex flex-col md:flex-row justify-between">
           <div class="mb-8 md:mb-0">
-            <h3 class="text-2xl font-bold mb-4 text-secondary">The Great Debaters</h3>
-            <p class="text-gray-300 max-w-md">
+            <h3 class="text-2xl font-bold mb-4 text-secondary" data-translate="footer-title">
+              The Great Debaters
+            </h3>
+            <p class="text-gray-300 max-w-md" data-translate="footer-description">
               Faculty of Sciences and Techniques Errachidia<br />Developing critical thinkers and
               eloquent speakers since 2018.
             </p>
           </div>
 
           <div class="mb-8 md:mb-0">
-            <h4 class="text-xl font-semibold mb-4 text-secondary">Contact Us</h4>
+            <h4 class="text-xl font-semibold mb-4 text-secondary" data-translate="contact-title">
+              Contact Us
+            </h4>
             <p class="text-gray-300 mb-2">
-              <i class="fas fa-map-marker-alt mr-2"></i> FST Errachidia, BP 509, Boutalamine,
-              Errachidia
+              <i class="fas fa-map-marker-alt mr-2"></i>
+              <span data-translate="address">FST Errachidia, BP 509, Boutalamine, Errachidia</span>
             </p>
             <p class="text-gray-300 mb-2">
-              <i class="fas fa-envelope mr-2"></i> debaters@fst-errachidia.ac.ma
+              <i class="fas fa-envelope mr-2"></i>
+              <span data-translate="email">debaters@fst-errachidia.ac.ma</span>
             </p>
             <p class="text-gray-300">
-              <i class="fas fa-users mr-2"></i> Meeting: Every Thursday, 6 PM
+              <i class="fas fa-users mr-2"></i>
+              <span data-translate="meeting-time">Meeting: Every Thursday, 6 PM</span>
             </p>
           </div>
 
           <div>
-            <h4 class="text-xl font-semibold mb-4 text-secondary">Connect With Us</h4>
+            <h4 class="text-xl font-semibold mb-4 text-secondary" data-translate="connect-title">
+              Connect With Us
+            </h4>
             <div class="flex space-x-4">
               <a
                 href="#"
@@ -573,7 +566,9 @@
         </div>
 
         <div class="border-t border-primaryLight mt-8 pt-8 text-center text-gray-300">
-          <p>&copy; 2026 The Great Debaters - FST Errachidia. All rights reserved.</p>
+          <p data-translate="copyright">
+            &copy; 2026 The Great Debaters - FST Errachidia. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
