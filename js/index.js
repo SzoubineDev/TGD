@@ -90,9 +90,9 @@ class LanguageManager {
   }
 
   async init() {
-    await this.loadTranslations();
+    await this.loadTranslations(); // Wait for translations to load
     this.setupEventListeners();
-    this.applyLanguage(this.currentLang);
+    this.applyLanguage(this.currentLang); // Now translations are ready
   }
 
   async loadTranslations() {
