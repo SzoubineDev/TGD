@@ -2,7 +2,6 @@
 const themeToggle = document.getElementById('theme-toggle');
 const themeIcon = document.getElementById('theme-icon');
 
-// Check for saved theme preference or use system preference
 if (
   localStorage.getItem('color-theme') === 'dark' ||
   (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
@@ -78,7 +77,7 @@ if (mobileMenuButton && mobileMenu) {
   });
 }
 
-// Enhanced Language Manager with Module Support
+// Enhanced Language Manager with JSON Support
 class LanguageManager {
   constructor() {
     this.currentLang = localStorage.getItem('preferred-language') || 'en';
@@ -87,29 +86,34 @@ class LanguageManager {
       fr: {},
       ar: {},
     };
-    this.pageTranslations = {};
     this.init();
   }
 
   async init() {
-    await this.loadPageTranslations();
+    await this.loadTranslations();
     this.setupEventListeners();
     this.applyLanguage(this.currentLang);
   }
 
-  async loadPageTranslations() {
+  async loadTranslations() {
     const currentPage = this.getCurrentPage();
 
     try {
       // Load common translations
-      const { commonTranslations } = await import('/js/translations/common.js');
-      this.addTranslations(commonTranslations);
+      const commonResponse = await fetch('./js/translations/common.json');
+      if (commonResponse.ok) {
+        const commonTranslations = await commonResponse.json();
+        this.addTranslations(commonTranslations);
+      }
 
       // Load page-specific translations
-      const pageModule = await import(`/js/translations/${currentPage}.js`);
-      this.addTranslations(pageModule.pageTranslations);
+      const pageResponse = await fetch(`./js/translations/${currentPage}.json`);
+      if (pageResponse.ok) {
+        const pageTranslations = await pageResponse.json();
+        this.addTranslations(pageTranslations);
+      }
     } catch (error) {
-      console.warn(`No specific translations found for ${currentPage}, using common only`);
+      console.error('Error loading translations:', error);
     }
   }
 
@@ -117,15 +121,12 @@ class LanguageManager {
     const path = window.location.pathname;
     const page = path.split('/').pop() || 'index.html';
 
-    console.log('Current page:', page); // Debug line
-
-    // Map pages to translation files
     if (page === 'index.html' || page === '' || page === '/') return 'home';
     if (page === 'about.html') return 'about';
     if (page === 'team.html') return 'team';
     if (page === 'latestEvents.html') return 'latestEvents';
 
-    return 'home'; // default
+    return 'home';
   }
 
   setupEventListeners() {
@@ -156,9 +157,7 @@ class LanguageManager {
   async switchLanguage(lang) {
     this.currentLang = lang;
     localStorage.setItem('preferred-language', lang);
-
-    // Reload translations for the new language
-    await this.loadPageTranslations();
+    await this.loadTranslations();
     this.applyLanguage(lang);
     this.updateActiveState();
     this.showLanguageFeedback(lang);
@@ -184,7 +183,6 @@ class LanguageManager {
     }
 
     this.updateDocumentDirection(lang);
-    this.updateDynamicContent(lang);
   }
 
   updateDocumentDirection(lang) {
@@ -199,10 +197,6 @@ class LanguageManager {
       document.body.classList.add('ltr');
       document.body.classList.remove('rtl');
     }
-  }
-
-  updateDynamicContent(lang) {
-    console.log(`Language switched to: ${lang}`);
   }
 
   updateActiveState() {
