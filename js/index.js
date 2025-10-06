@@ -78,7 +78,7 @@ if (mobileMenuButton && mobileMenu) {
   });
 }
 
-// Enhanced Language Manager with JSON Support
+// Enhanced Language Manager with Module Support
 class LanguageManager {
   constructor() {
     this.currentLang = localStorage.getItem('preferred-language') || 'en';
@@ -87,41 +87,29 @@ class LanguageManager {
       fr: {},
       ar: {},
     };
+    this.pageTranslations = {};
     this.init();
   }
 
   async init() {
-    await this.loadTranslations();
+    await this.loadPageTranslations();
     this.setupEventListeners();
     this.applyLanguage(this.currentLang);
   }
 
-  async loadTranslations() {
+  async loadPageTranslations() {
     const currentPage = this.getCurrentPage();
-    console.log('🔄 Loading translations for:', currentPage);
 
     try {
       // Load common translations
-      const commonResponse = await fetch('./js/translations/common.json');
-      if (commonResponse.ok) {
-        const commonTranslations = await commonResponse.json();
-        this.addTranslations(commonTranslations);
-        console.log('✅ Common translations loaded');
-      } else {
-        console.error('❌ Failed to load common.json');
-      }
+      const { commonTranslations } = await import('/js/translations/common.js');
+      this.addTranslations(commonTranslations);
 
       // Load page-specific translations
-      const pageResponse = await fetch(`./js/translations/${currentPage}.json`);
-      if (pageResponse.ok) {
-        const pageTranslations = await pageResponse.json();
-        this.addTranslations(pageTranslations);
-        console.log('✅ Page translations loaded for:', currentPage);
-      } else {
-        console.warn('⚠️ No page-specific translations for:', currentPage);
-      }
+      const pageModule = await import(`/js/translations/${currentPage}.js`);
+      this.addTranslations(pageModule.pageTranslations);
     } catch (error) {
-      console.error('💥 Error loading translations:', error);
+      console.warn(`No specific translations found for ${currentPage}, using common only`);
     }
   }
 
@@ -129,12 +117,15 @@ class LanguageManager {
     const path = window.location.pathname;
     const page = path.split('/').pop() || 'index.html';
 
+    console.log('Current page:', page); // Debug line
+
+    // Map pages to translation files
     if (page === 'index.html' || page === '' || page === '/') return 'home';
     if (page === 'about.html') return 'about';
     if (page === 'team.html') return 'team';
     if (page === 'latestEvents.html') return 'latestEvents';
 
-    return 'home';
+    return 'home'; // default
   }
 
   setupEventListeners() {
@@ -165,6 +156,9 @@ class LanguageManager {
   async switchLanguage(lang) {
     this.currentLang = lang;
     localStorage.setItem('preferred-language', lang);
+
+    // Reload translations for the new language
+    await this.loadPageTranslations();
     this.applyLanguage(lang);
     this.updateActiveState();
     this.showLanguageFeedback(lang);
@@ -190,6 +184,7 @@ class LanguageManager {
     }
 
     this.updateDocumentDirection(lang);
+    this.updateDynamicContent(lang);
   }
 
   updateDocumentDirection(lang) {
@@ -204,6 +199,10 @@ class LanguageManager {
       document.body.classList.add('ltr');
       document.body.classList.remove('rtl');
     }
+  }
+
+  updateDynamicContent(lang) {
+    console.log(`Language switched to: ${lang}`);
   }
 
   updateActiveState() {
