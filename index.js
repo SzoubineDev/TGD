@@ -768,14 +768,33 @@ class LanguageManager {
   }
 
   getCurrentPage() {
-    const path = window.location.pathname;
-    const page = path.split('/').pop() || 'index.html';
+    // Get the full path and normalize it
+    const fullPath = window.location.pathname;
+    const page = fullPath.split('/').pop() || 'index.html';
 
-    if (page === 'index.html' || page === '' || page === '/') return 'home';
-    if (page === 'about.html') return 'about';
-    if (page === 'team.html') return 'team';
-    if (page === 'latestEvents.html') return 'latestEvents';
+    console.log('🔍 Current path analysis:');
+    console.log('- Full path:', fullPath);
+    console.log('- Extracted page:', page);
 
+    // Handle different page naming patterns
+    if (page === 'index.html' || page === '' || page === '/') {
+      console.log('✅ Detected: Home page');
+      return 'home';
+    }
+    if (page === 'about.html') {
+      console.log('✅ Detected: About page');
+      return 'about';
+    }
+    if (page === 'team.html') {
+      console.log('✅ Detected: Team page');
+      return 'team';
+    }
+    if (page === 'latestEvents.html') {
+      console.log('✅ Detected: Latest Events page');
+      return 'latestEvents';
+    }
+
+    console.warn('❓ Unknown page, defaulting to home:', page);
     return 'home';
   }
 
