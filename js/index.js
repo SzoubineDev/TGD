@@ -89,13 +89,16 @@ class LanguageManager {
     this.init();
   }
   async init() {
+    console.log('🔄 Starting initialization...');
+
     await this.loadTranslations();
+    console.log('✅ Translations loaded:', Object.keys(this.translations.en));
+
     this.setupEventListeners();
 
-    // Small delay to ensure DOM is ready
-    setTimeout(() => {
-      this.applyLanguage(this.currentLang);
-    }, 100);
+    console.log('🔄 Applying language...');
+    this.applyLanguage(this.currentLang);
+    console.log('✅ Language applied');
   }
   async loadTranslations() {
     const currentPage = this.getCurrentPage();
