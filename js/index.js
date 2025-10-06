@@ -96,7 +96,6 @@ class LanguageManager {
     this.setupEventListeners();
     this.applyLanguage(this.currentLang);
   }
-
   async loadPageTranslations() {
     const currentPage = this.getCurrentPage();
 
