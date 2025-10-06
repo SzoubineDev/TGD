@@ -102,23 +102,34 @@ class LanguageManager {
   }
   async loadTranslations() {
     const currentPage = this.getCurrentPage();
+    console.log('🔄 Current page:', currentPage);
 
     try {
-      // Load common translations
+      // Test common.json
       const commonResponse = await fetch('./js/translations/common.json');
+      console.log('📄 common.json status:', commonResponse.status, commonResponse.ok);
+
+      // Test page-specific JSON
+      const pageUrl = `./js/translations/${currentPage}.json`;
+      console.log('🔍 Looking for:', pageUrl);
+      const pageResponse = await fetch(pageUrl);
+      console.log('📄 Page JSON status:', pageResponse.status, pageResponse.ok);
+
       if (commonResponse.ok) {
         const commonTranslations = await commonResponse.json();
         this.addTranslations(commonTranslations);
+        console.log('✅ Common translations loaded');
       }
 
-      // Load page-specific translations
-      const pageResponse = await fetch(`./js/translations/${currentPage}.json`);
       if (pageResponse.ok) {
         const pageTranslations = await pageResponse.json();
         this.addTranslations(pageTranslations);
+        console.log('✅ Page translations loaded:', Object.keys(pageTranslations.en || {}));
+      } else {
+        console.error('❌ Page JSON not found:', pageUrl);
       }
     } catch (error) {
-      console.error('Error loading translations:', error);
+      console.error('💥 Error:', error);
     }
   }
 
