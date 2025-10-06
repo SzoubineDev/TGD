@@ -100,13 +100,14 @@ class LanguageManager {
   async loadPageTranslations() {
     const currentPage = this.getCurrentPage();
 
+    // Determine base path dynamically
+    const basePath = window.location.hostname === 'localhost' ? '.' : '/js';
+
     try {
-      // Load common translations
-      const { commonTranslations } = await import('./translations/common.js');
+      const { commonTranslations } = await import(`${basePath}/translations/common.js`);
       this.addTranslations(commonTranslations);
 
-      // Load page-specific translations
-      const pageModule = await import(`./translations/${currentPage}.js`);
+      const pageModule = await import(`${basePath}/translations/${currentPage}.js`);
       this.addTranslations(pageModule.pageTranslations);
     } catch (error) {
       console.warn(`No specific translations found for ${currentPage}, using common only`);
