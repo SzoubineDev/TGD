@@ -88,13 +88,15 @@ class LanguageManager {
     };
     this.init();
   }
-
   async init() {
-    await this.loadTranslations(); // Wait for translations to load
+    await this.loadTranslations();
     this.setupEventListeners();
-    this.applyLanguage(this.currentLang); // Now translations are ready
-  }
 
+    // Small delay to ensure DOM is ready
+    setTimeout(() => {
+      this.applyLanguage(this.currentLang);
+    }, 100);
+  }
   async loadTranslations() {
     const currentPage = this.getCurrentPage();
 
