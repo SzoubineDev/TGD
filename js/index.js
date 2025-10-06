@@ -78,7 +78,7 @@ if (mobileMenuButton && mobileMenu) {
   });
 }
 
-// Enhanced Language Manager with Module Support
+// Enhanced Language Manager with JSON Support
 class LanguageManager {
   constructor() {
     this.currentLang = localStorage.getItem('preferred-language') || 'en';
@@ -87,115 +87,54 @@ class LanguageManager {
       fr: {},
       ar: {},
     };
-    this.pageTranslations = {};
     this.init();
   }
 
   async init() {
-    await this.loadPageTranslations();
+    await this.loadTranslations();
     this.setupEventListeners();
     this.applyLanguage(this.currentLang);
   }
-  async loadPageTranslations() {
+
+  async loadTranslations() {
     const currentPage = this.getCurrentPage();
     console.log('🔄 Loading translations for:', currentPage);
 
-    // Better base path detection
-    const getBasePath = () => {
-      // If we're on localhost
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        return '.';
-      }
-
-      // If we're on GitHub Pages, the base path is usually the repo name
-      // Try to detect if we're in a subdirectory
-      const path = window.location.pathname;
-      if (path.includes('/TGD/') || path.includes('/thegreatdebaters/')) {
-        return '/TGD';
-      }
-
-      // Default to root
-      return '';
-    };
-
-    const basePath = getBasePath();
-    console.log('📍 Base path detected:', basePath);
-    console.log('📁 Full URL:', window.location.href);
-
     try {
-      // Test multiple path strategies
-      const pathsToTry = [
-        `${basePath}/js/translations/common.js`,
-        `${basePath}/translations/common.js`,
-        `/js/translations/common.js`,
-        `./js/translations/common.js`,
-        `js/translations/common.js`,
-      ];
-
-      let commonLoaded = false;
-
-      for (const path of pathsToTry) {
-        try {
-          console.log('🔍 Trying path:', path);
-          const { commonTranslations } = await import(path);
-          this.addTranslations(commonTranslations);
-          console.log('✅ Common translations loaded from:', path);
-          commonLoaded = true;
-          break;
-        } catch (e) {
-          console.log('❌ Failed:', path, e.message);
-        }
-      }
-
-      if (!commonLoaded) {
-        console.error('🚨 Could not load common translations from any path');
-        return;
+      // Load common translations
+      const commonResponse = await fetch('./js/translations/common.json');
+      if (commonResponse.ok) {
+        const commonTranslations = await commonResponse.json();
+        this.addTranslations(commonTranslations);
+        console.log('✅ Common translations loaded');
+      } else {
+        console.error('❌ Failed to load common.json');
       }
 
       // Load page-specific translations
-      const pagePaths = [
-        `${basePath}/js/translations/${currentPage}.js`,
-        `${basePath}/translations/${currentPage}.js`,
-        `/js/translations/${currentPage}.js`,
-        `./js/translations/${currentPage}.js`,
-        `js/translations/${currentPage}.js`,
-      ];
-
-      let pageLoaded = false;
-
-      for (const path of pagePaths) {
-        try {
-          console.log('🔍 Trying page path:', path);
-          const pageModule = await import(path);
-          this.addTranslations(pageModule.pageTranslations);
-          console.log('✅ Page translations loaded from:', path);
-          pageLoaded = true;
-          break;
-        } catch (e) {
-          console.log('❌ Page load failed:', path, e.message);
-        }
-      }
-
-      if (!pageLoaded) {
-        console.warn('⚠️ Could not load page-specific translations');
+      const pageResponse = await fetch(`./js/translations/${currentPage}.json`);
+      if (pageResponse.ok) {
+        const pageTranslations = await pageResponse.json();
+        this.addTranslations(pageTranslations);
+        console.log('✅ Page translations loaded for:', currentPage);
+      } else {
+        console.warn('⚠️ No page-specific translations for:', currentPage);
       }
     } catch (error) {
-      console.error('💥 CRITICAL ERROR:', error);
+      console.error('💥 Error loading translations:', error);
     }
   }
+
   getCurrentPage() {
     const path = window.location.pathname;
     const page = path.split('/').pop() || 'index.html';
 
-    console.log('Current page:', page); // Debug line
-
-    // Map pages to translation files
     if (page === 'index.html' || page === '' || page === '/') return 'home';
     if (page === 'about.html') return 'about';
     if (page === 'team.html') return 'team';
     if (page === 'latestEvents.html') return 'latestEvents';
 
-    return 'home'; // default
+    return 'home';
   }
 
   setupEventListeners() {
@@ -226,9 +165,6 @@ class LanguageManager {
   async switchLanguage(lang) {
     this.currentLang = lang;
     localStorage.setItem('preferred-language', lang);
-
-    // Reload translations for the new language
-    await this.loadPageTranslations();
     this.applyLanguage(lang);
     this.updateActiveState();
     this.showLanguageFeedback(lang);
@@ -254,7 +190,6 @@ class LanguageManager {
     }
 
     this.updateDocumentDirection(lang);
-    this.updateDynamicContent(lang);
   }
 
   updateDocumentDirection(lang) {
@@ -269,10 +204,6 @@ class LanguageManager {
       document.body.classList.add('ltr');
       document.body.classList.remove('rtl');
     }
-  }
-
-  updateDynamicContent(lang) {
-    console.log(`Language switched to: ${lang}`);
   }
 
   updateActiveState() {
