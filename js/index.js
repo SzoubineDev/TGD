@@ -98,21 +98,91 @@ class LanguageManager {
   }
   async loadPageTranslations() {
     const currentPage = this.getCurrentPage();
+    console.log('🔄 Loading translations for:', currentPage);
 
-    // Determine base path dynamically
-    const basePath = window.location.hostname === 'localhost' ? '.' : '/js';
+    // Better base path detection
+    const getBasePath = () => {
+      // If we're on localhost
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return '.';
+      }
+
+      // If we're on GitHub Pages, the base path is usually the repo name
+      // Try to detect if we're in a subdirectory
+      const path = window.location.pathname;
+      if (path.includes('/TGD/') || path.includes('/thegreatdebaters/')) {
+        return '/TGD';
+      }
+
+      // Default to root
+      return '';
+    };
+
+    const basePath = getBasePath();
+    console.log('📍 Base path detected:', basePath);
+    console.log('📁 Full URL:', window.location.href);
 
     try {
-      const { commonTranslations } = await import(`${basePath}/translations/common.js`);
-      this.addTranslations(commonTranslations);
+      // Test multiple path strategies
+      const pathsToTry = [
+        `${basePath}/js/translations/common.js`,
+        `${basePath}/translations/common.js`,
+        `/js/translations/common.js`,
+        `./js/translations/common.js`,
+        `js/translations/common.js`,
+      ];
 
-      const pageModule = await import(`${basePath}/translations/${currentPage}.js`);
-      this.addTranslations(pageModule.pageTranslations);
+      let commonLoaded = false;
+
+      for (const path of pathsToTry) {
+        try {
+          console.log('🔍 Trying path:', path);
+          const { commonTranslations } = await import(path);
+          this.addTranslations(commonTranslations);
+          console.log('✅ Common translations loaded from:', path);
+          commonLoaded = true;
+          break;
+        } catch (e) {
+          console.log('❌ Failed:', path, e.message);
+        }
+      }
+
+      if (!commonLoaded) {
+        console.error('🚨 Could not load common translations from any path');
+        return;
+      }
+
+      // Load page-specific translations
+      const pagePaths = [
+        `${basePath}/js/translations/${currentPage}.js`,
+        `${basePath}/translations/${currentPage}.js`,
+        `/js/translations/${currentPage}.js`,
+        `./js/translations/${currentPage}.js`,
+        `js/translations/${currentPage}.js`,
+      ];
+
+      let pageLoaded = false;
+
+      for (const path of pagePaths) {
+        try {
+          console.log('🔍 Trying page path:', path);
+          const pageModule = await import(path);
+          this.addTranslations(pageModule.pageTranslations);
+          console.log('✅ Page translations loaded from:', path);
+          pageLoaded = true;
+          break;
+        } catch (e) {
+          console.log('❌ Page load failed:', path, e.message);
+        }
+      }
+
+      if (!pageLoaded) {
+        console.warn('⚠️ Could not load page-specific translations');
+      }
     } catch (error) {
-      console.warn(`No specific translations found for ${currentPage}, using common only`);
+      console.error('💥 CRITICAL ERROR:', error);
     }
   }
-
   getCurrentPage() {
     const path = window.location.pathname;
     const page = path.split('/').pop() || 'index.html';
