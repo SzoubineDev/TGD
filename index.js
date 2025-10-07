@@ -368,7 +368,7 @@ const ALL_TRANSLATIONS = {
       'contact-team-btn': 'Contactez notre équipe',
     },
     ar: {
-      'about-hero-title': 'عن المتحدثين الكبار',
+      'about-hero-title': 'المتناظرون العظماء',
       'about-hero-desc':
         'أهم جمعية مناظرة في كلية العلوم والتقنيات الرشيدية، تعزز التفكير النقدي والتعبير البليغ والحوار الفكري منذ 2018.',
       'who-we-are-title': 'من نحن',
