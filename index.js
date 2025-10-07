@@ -502,7 +502,7 @@ const ALL_TRANSLATIONS = {
       'president-name': 'El mouhaddine Fatima ezzahra',
       'president-role': 'Présidente',
       'president-desc':
-        'Étudiante en génie chimique passionnée par le discours politique. Dirige la vision stratégique du club et représente Les Grands Débatteurs lors des événements universitaires.',
+        'Étudiante en génie chimique passionnée par le discours social. Dirige la vision stratégique du club et représente Les Grands Débatteurs lors des événements universitaires.',
       'vice-president-name': 'Zoubine Soulaimane',
       'vice-president-role': 'Vice-Président',
       'vice-president-desc':
@@ -562,7 +562,7 @@ const ALL_TRANSLATIONS = {
       'president-name': 'المهدين فاطمة الزهراء',
       'president-role': 'الرئيسة',
       'president-desc':
-        'طالبة هندسة كيمياء شغوفة بالخطاب السياسي. تقود الرؤية الاستراتيجية للنادي وتمثل المتحدثين الكبار في الفعاليات الجامعية.',
+        'طالبة هندسة كيمياء شغوفة بالخطاب الاجتماعي . تقود الرؤية الاستراتيجية للنادي وتمثل المتحدثين الكبار في الفعاليات الجامعية.',
       'vice-president-name': 'زبين سليمان',
       'vice-president-role': 'نائب الرئيس',
       'vice-president-desc':
