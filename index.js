@@ -116,12 +116,12 @@ const ALL_TRANSLATIONS = {
       copyright: '© 2026 Les Grands Débatteurs - FST Errachidia. Tous droits réservés.',
     },
     ar: {
-      'nav-title': 'المتحدثون الكبار',
+      'nav-title': 'المتناظرون العظماء',
       'nav-home': 'الرئيسية',
       'nav-about': 'من نحن',
       'nav-team': 'فريقنا',
-      'nav-events': 'أحداث حديثة',
-      'footer-title': 'المتحدثون الكبار',
+      'nav-events': 'أحداث ',
+      'footer-title': 'المتناظرون العظماء',
       'footer-description':
         'كلية العلوم والتقنيات الرشيدية<br />تطوير مفكرين نقديين ومتحدثين بليغين منذ 2018.',
       'contact-title': 'اتصل بنا',
@@ -129,7 +129,7 @@ const ALL_TRANSLATIONS = {
       email: 'debaters@fst-errachidia.ac.ma',
       'meeting-time': 'الاجتماع: كل خميس، الساعة 6 مساءً',
       'connect-title': 'تواصل معنا',
-      copyright: '© 2026 المتحدثون الكبار - كلية العلوم والتقنيات الرشيدية. جميع الحقوق محفوظة.',
+      copyright: '© 2026 المتناظرون العظماء- كلية العلوم والتقنيات الرشيدية. جميع الحقوق محفوظة.',
     },
   },
   home: {
@@ -228,7 +228,7 @@ const ALL_TRANSLATIONS = {
       'community-desc-2':
         'تقدم برامجنا التوعوية مهارات النقاش للمدارس ومراكز المجتمع، مما يمكن المزيد من الأشخاص من المشاركة في الخطاب البناء.',
       testimonials: 'ما يقوله أعضاؤنا',
-      'team-captain': 'قائد الفريق، 2022',
+      'team-captain': 'رئيس النادي , 2022',
       'english-student': 'طالب إنجليزي حالي',
       'member-since': 'عضو منذ 2021',
       'testimonial-1':
