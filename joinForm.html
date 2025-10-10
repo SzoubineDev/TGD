@@ -151,12 +151,13 @@
           <span>Continue with Google</span>
         </button>
 
-        <!-- Status Message -->
-        <div
-          id="statusMessage"
-          class="mt-4 p-3 bg-blue-900 border border-blue-700 rounded text-blue-200 text-sm text-center"
-        >
-          <p>✅ OAuth is configured! Google Sign-In should work now.</p>
+        <div class="text-center mt-6">
+          <p class="text-gray-400">
+            Already a member?
+            <button id="toggleLogin" class="text-blue-400 hover:text-blue-300 font-medium">
+              Sign In
+            </button>
+          </p>
         </div>
       </div>
     </div>
@@ -175,9 +176,9 @@
       // Initialize Firebase
       try {
         firebase.initializeApp(firebaseConfig);
-        console.log('✅ Firebase initialized successfully');
+        console.log('Firebase initialized successfully');
       } catch (error) {
-        console.error('❌ Firebase initialization error:', error);
+        console.error('Firebase initialization error:', error);
       }
 
       const auth = firebase.auth();
@@ -188,7 +189,6 @@
       const googleSignIn = document.getElementById('googleSignIn');
       const referralSource = document.getElementById('referralSource');
       const otherSourceField = document.getElementById('otherSourceField');
-      const statusMessage = document.getElementById('statusMessage');
 
       // Show/hide other source field
       referralSource.addEventListener('change', function () {
@@ -237,7 +237,7 @@
             uid: user.uid,
           });
 
-          alert('🎉 Account created successfully! Welcome to The Great Debaters!');
+          alert('Account created successfully! Welcome to The Great Debaters!');
           registrationForm.reset();
           otherSourceField.classList.add('hidden');
         } catch (error) {
@@ -256,7 +256,7 @@
               break;
           }
 
-          alert('❌ ' + errorMessage);
+          alert(errorMessage);
         } finally {
           submitButton.disabled = false;
           submitButton.textContent = 'Become a Member';
@@ -268,8 +268,7 @@
         const provider = new firebase.auth.GoogleAuthProvider();
 
         googleSignIn.disabled = true;
-        googleSignIn.innerHTML =
-          '<i class="fas fa-spinner fa-spin"></i><span>Connecting to Google...</span>';
+        googleSignIn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Connecting...</span>';
 
         try {
           const result = await auth.signInWithPopup(provider);
@@ -291,23 +290,13 @@
                 uid: user.uid,
                 isGoogleUser: true,
               });
-            alert('🎉 Account created with Google! Welcome to The Great Debaters!');
+            alert('Account created successfully! Welcome!');
           } else {
-            alert('✅ Successfully signed in with Google! Welcome back!');
+            alert('Successfully signed in! Welcome back!');
           }
         } catch (error) {
           console.error('Google sign in error:', error);
-
-          if (error.code === 'auth/popup-closed-by-user') {
-            alert('Google sign-in was cancelled');
-          } else if (error.code === 'auth/unauthorized-domain') {
-            statusMessage.innerHTML =
-              '❌ Domain not authorized. Make sure localhost is in authorized domains.';
-            statusMessage.className =
-              'mt-4 p-3 bg-red-900 border border-red-700 rounded text-red-200 text-sm text-center';
-          } else {
-            alert('Google Sign-In error: ' + error.message);
-          }
+          alert('Google Sign-In is not configured yet');
         } finally {
           googleSignIn.disabled = false;
           googleSignIn.innerHTML =
