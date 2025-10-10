@@ -3,655 +3,489 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Great Debaters - Community</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <title>Secure Debate Platform</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/profanity-filter@1.0.0/lib/profanity-filter.min.js"></script>
+    <style>
+      :root {
+        --primary: #1a365d;
+        --primary-light: #2d3748;
+        --secondary: #ecc94b;
+        --gray-900: #1a202c;
+        --white: #ffffff;
+      }
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: #f7fafc;
+        color: var(--gray-900);
+        line-height: 1.6;
+      }
+
+      .security-section {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        padding: 2rem;
+        color: var(--white);
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+
+      .security-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .security-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .security-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .security-header p {
+        opacity: 0.9;
+        font-size: 1.1rem;
+      }
+
+      .security-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .feature-card {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .feature-card h3 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .feature-card h3 i {
+        color: var(--secondary);
+      }
+
+      .feature-card ul {
+        list-style-type: none;
+      }
+
+      .feature-card li {
+        margin-bottom: 0.5rem;
+        padding-left: 1.5rem;
+        position: relative;
+      }
+
+      .feature-card li:before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: var(--secondary);
+        font-weight: bold;
+      }
+
+      .demo-section {
+        background: var(--white);
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+
+      .demo-section h2 {
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+
+      .demo-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+      }
+
+      @media (max-width: 768px) {
+        .demo-container {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .input-area,
+      .output-area {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .input-area textarea {
+        height: 150px;
+        padding: 1rem;
+        border: 1px solid #cbd5e0;
+        border-radius: 8px;
+        resize: vertical;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+      }
+
+      .input-area button {
+        background: var(--secondary);
+        color: var(--gray-900);
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+
+      .input-area button:hover {
+        background: #d69e2e;
+      }
+
+      .output-area .message {
+        background: #edf2f7;
+        padding: 1rem;
+        border-radius: 8px;
+        min-height: 150px;
+        border: 1px dashed #cbd5e0;
+      }
+
+      .rules-section {
+        background: var(--white);
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .rules-section h2 {
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+
+      .rules-tabs {
+        display: flex;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+      }
+
+      .tab-button {
+        padding: 0.8rem 1.5rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        color: #718096;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+      }
+
+      .tab-button.active {
+        color: var(--primary);
+        border-bottom: 3px solid var(--secondary);
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .code-block {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 1.5rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+
+      .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .alert.warning {
+        background: #fed7d7;
+        color: #c53030;
+        border-left: 4px solid #fc8181;
+      }
+
+      .alert.success {
+        background: #c6f6d5;
+        color: #2d7d32;
+        border-left: 4px solid #68d391;
+      }
+
+      .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      .status-indicator.secure {
+        background: #c6f6d5;
+        color: #2d7d32;
+      }
+
+      .status-indicator.insecure {
+        background: #fed7d7;
+        color: #c53030;
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      .status-dot.secure {
+        background: #2d7d32;
+      }
+
+      .status-dot.insecure {
+        background: #c53030;
+      }
+    </style>
   </head>
-  <body class="min-h-screen bg-gray-900">
-    <!-- Navigation -->
-    <nav class="bg-gray-800 border-b border-gray-700 sticky top-0 z-40">
-      <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-        <div class="flex items-center space-x-4">
-          <h1 class="text-xl font-bold text-white">The Great Debaters</h1>
-          <span class="text-gray-400">|</span>
-          <span class="text-gray-300" id="userWelcome">Community Feed</span>
+  <body>
+    <section class="security-section">
+      <div class="security-container">
+        <div class="security-header">
+          <h1>Firebase Security Implementation</h1>
+          <p>Protect your application from unauthorized content and malicious users</p>
         </div>
-        <div class="flex items-center space-x-4">
-          <button
-            onclick="createPost()"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-          >
-            <i class="fas fa-plus mr-2"></i>New Post
-          </button>
-          <button onclick="logout()" class="text-gray-400 hover:text-white">
-            <i class="fas fa-sign-out-alt mr-2"></i>Logout
-          </button>
-        </div>
-      </div>
-    </nav>
 
-    <!-- Create Post Modal -->
-    <div
-      id="createPostModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
-    >
-      <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 class="text-xl font-bold text-white mb-4">Create New Post</h3>
+        <div class="security-features">
+          <div class="feature-card">
+            <h3><i>🔒</i> Authentication Security</h3>
+            <ul>
+              <li>User authentication required for write operations</li>
+              <li>Email verification for sensitive actions</li>
+              <li>Role-based access control</li>
+              <li>Session management and timeout</li>
+            </ul>
+          </div>
 
-        <!-- Image Preview -->
-        <div id="imagePreview" class="mb-4 hidden">
-          <img id="previewImage" class="w-full rounded-lg max-h-48 object-cover" />
-          <div class="flex justify-between items-center mt-2">
-            <span id="fileSize" class="text-gray-400 text-sm"></span>
-            <button onclick="removeImage()" class="text-red-400 hover:text-red-300 text-sm">
-              <i class="fas fa-times mr-1"></i>Remove
-            </button>
+          <div class="feature-card">
+            <h3><i>🛡️</i> Firestore Security Rules</h3>
+            <ul>
+              <li>Content validation rules</li>
+              <li>User ownership verification</li>
+              <li>Rate limiting for writes</li>
+              <li>Prevention of mass deletions</li>
+            </ul>
+          </div>
+
+          <div class="feature-card">
+            <h3><i>🚫</i> Content Moderation</h3>
+            <ul>
+              <li>Profanity filtering</li>
+              <li>Image content scanning</li>
+              <li>Report and flagging system</li>
+              <li>Admin moderation panel</li>
+            </ul>
           </div>
         </div>
 
-        <textarea
-          id="postContent"
-          placeholder="What's on your mind?"
-          class="w-full h-32 bg-gray-700 border border-gray-600 rounded-lg p-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 mb-4"
-        ></textarea>
+        <div class="status-indicator secure">
+          <div class="status-dot secure"></div>
+          Security Status: Protected
+        </div>
+      </div>
+    </section>
 
-        <!-- Image Upload -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-300 mb-2">Add Image (Optional)</label>
-          <div class="flex items-center space-x-2">
-            <label
-              for="imageUpload"
-              class="cursor-pointer bg-gray-700 hover:bg-gray-600 text-gray-300 px-4 py-2 rounded-lg text-sm border border-gray-600"
+    <div class="security-container">
+      <section class="demo-section">
+        <h2>Content Moderation Demo</h2>
+        <div class="demo-container">
+          <div class="input-area">
+            <textarea id="userInput" placeholder="Try posting inappropriate content here...">
+This is a test message with some bad words.</textarea
             >
-              <i class="fas fa-image mr-2"></i>Choose Image
-            </label>
-            <input
-              type="file"
-              id="imageUpload"
-              accept="image/*"
-              class="hidden"
-              onchange="previewImage(this)"
-            />
-            <span id="fileName" class="text-gray-400 text-sm"></span>
+            <button id="submitBtn">Check Content</button>
           </div>
-          <p class="text-xs text-gray-500 mt-1">For faster uploads, use images under 1MB</p>
-        </div>
-
-        <!-- Upload Progress -->
-        <div id="uploadProgress" class="hidden mb-4">
-          <div class="flex justify-between text-sm text-gray-300 mb-1">
-            <span>Uploading image...</span>
-            <span id="progressPercent">0%</span>
-          </div>
-          <div class="w-full bg-gray-700 rounded-full h-2">
-            <div
-              id="progressBar"
-              class="bg-blue-600 h-2 rounded-full transition-all duration-300"
-              style="width: 0%"
-            ></div>
+          <div class="output-area">
+            <div class="message" id="outputMessage">
+              Safe content will appear here. Try posting something inappropriate to see the filter
+              in action.
+            </div>
           </div>
         </div>
+      </section>
 
-        <div class="flex justify-end space-x-3">
-          <button onclick="closeCreatePost()" class="px-4 py-2 text-gray-400 hover:text-white">
-            Cancel
-          </button>
-          <button
-            onclick="submitPost()"
-            id="submitPostBtn"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
-          >
-            <i class="fas fa-paper-plane mr-2"></i>Post
-          </button>
+      <section class="rules-section">
+        <h2>Firebase Security Rules</h2>
+
+        <div class="rules-tabs">
+          <button class="tab-button active" data-tab="firestore">Firestore Rules</button>
+          <button class="tab-button" data-tab="storage">Storage Rules</button>
+          <button class="tab-button" data-tab="auth">Authentication</button>
         </div>
-      </div>
-    </div>
 
-    <!-- Main Content -->
-    <div class="max-w-2xl mx-auto p-4 space-y-6">
-      <!-- Posts will be loaded here -->
-      <div id="postsContainer"></div>
+        <div class="tab-content active" id="firestore-tab">
+          <div class="alert warning">
+            <strong>Warning:</strong> Never rely solely on client-side validation. Always implement
+            server-side security rules.
+          </div>
 
-      <!-- Loading -->
-      <div id="loading" class="text-center py-8">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-        <p class="text-gray-400 mt-2">Loading posts...</p>
-      </div>
+          <div class="code-block">
+            // Firestore Security Rules rules_version = '2'; service cloud.firestore { match
+            /databases/{database}/documents { // Posts collection - users can only read approved
+            content match /posts/{postId} { allow read: if resource.data.approved == true; allow
+            create: if request.auth != null && request.auth.token.email_verified == true &&
+            request.resource.data.keys().hasAll(['title', 'content', 'authorId']) &&
+            request.resource.data.authorId == request.auth.uid && request.resource.data.title is
+            string && request.resource.data.title.size() >= 5 && request.resource.data.title.size()
+            <= 100 && request.resource.data.content is string &&
+            request.resource.data.content.size() >= 10 && request.resource.data.content.size() <=
+            5000 &&
+            !request.resource.data.content.matches('(?i).*\\b(asshole|fuck|porn|nigger|shit|cunt)\\b.*');
+            allow update, delete: if request.auth != null && request.auth.uid ==
+            resource.data.authorId && request.resource.data.approved == false; } // Admin users have
+            full access match /{document=**} { allow read, write: if request.auth != null &&
+            get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true; }
+            } }
+          </div>
+        </div>
+
+        <div class="tab-content" id="storage-tab">
+          <div class="code-block">
+            // Firebase Storage Rules rules_version = '2'; service firebase.storage { match
+            /b/{bucket}/o { // User uploads - only images under 5MB allowed match
+            /uploads/{userId}/{allPaths=**} { allow read: if request.auth != null; allow write: if
+            request.auth != null && request.auth.uid == userId && request.resource.size < 5 * 1024 *
+            1024 && request.resource.contentType.matches('image/.*') &&
+            request.resource.name.matches('.*\\.(jpg|jpeg|png|gif)$'); } // Public content - anyone
+            can read approved content match /public/{allPaths=**} { allow read: if
+            resource.metadata.approved == 'true'; allow write: if request.auth != null &&
+            get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true; }
+            } }
+          </div>
+        </div>
+
+        <div class="tab-content" id="auth-tab">
+          <div class="code-block">
+            // Authentication Security Implementation (JavaScript) import { initializeApp } from
+            'firebase/app'; import { getAuth, createUserWithEmailAndPassword,
+            signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut } from
+            'firebase/auth'; const firebaseConfig = { // Your Firebase config here }; const app =
+            initializeApp(firebaseConfig); const auth = getAuth(app); // Only allow verified users
+            to post content function canUserPost() { const user = auth.currentUser; return user &&
+            user.emailVerified; } // Require email verification for new users async function
+            registerUser(email, password) { try { const userCredential = await
+            createUserWithEmailAndPassword(auth, email, password); await
+            sendEmailVerification(userCredential.user); // Redirect to verification page
+            alert('Please verify your email before posting content.'); } catch (error) {
+            console.error('Registration error:', error); alert('Registration failed: ' +
+            error.message); } } // Monitor authentication state onAuthStateChanged(auth, (user) => {
+            if (user) { if (user.emailVerified) { // User is verified, enable posting
+            document.getElementById('postButton').disabled = false; } else { // User not verified,
+            disable posting document.getElementById('postButton').disabled = true; alert('Please
+            verify your email to post content.'); } } else { // User is signed out
+            document.getElementById('postButton').disabled = true; } });
+          </div>
+        </div>
+      </section>
     </div>
 
     <script>
-      // Firebase Configuration
-      const firebaseConfig = {
-        apiKey: 'AIzaSyC6CtIlRko2CFf0owSvUlZMeVtkVDMy2BU',
-        authDomain: 'the-gd-fste-ce113.firebaseapp.com',
-        projectId: 'the-gd-fste-ce113',
-        storageBucket: 'the-gd-fste-ce113.appspot.com',
-        messagingSenderId: '485167566903',
-        appId: '1:485167566903:web:9e5dfacd7e34741cf96fb2',
-      };
+      // Tab functionality
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+          // Remove active class from all buttons and content
+          document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+          document
+            .querySelectorAll('.tab-content')
+            .forEach(content => content.classList.remove('active'));
 
-      // Initialize Firebase
-      try {
-        firebase.initializeApp(firebaseConfig);
-        console.log('✅ Firebase initialized successfully');
-      } catch (error) {
-        console.error('❌ Firebase initialization error:', error);
-      }
+          // Add active class to clicked button
+          button.classList.add('active');
 
-      const auth = firebase.auth();
-      const db = firebase.firestore();
-      const storage = firebase.storage();
-      let currentUser = null;
-      let selectedImageFile = null;
-
-      // Check authentication
-      auth.onAuthStateChanged(user => {
-        if (!user) {
-          window.location.href = 'joinForm.html';
-        } else {
-          currentUser = user;
-          document.getElementById('userWelcome').textContent = `Welcome, ${
-            user.displayName || user.email.split('@')[0]
-          }!`;
-          loadPosts();
-        }
-      });
-
-      // Preview selected image with compression
-      function previewImage(input) {
-        const file = input.files[0];
-        if (file) {
-          if (!file.type.startsWith('image/')) {
-            alert('Please select an image file');
-            input.value = '';
-            return;
-          }
-
-          if (file.size > 2 * 1024 * 1024) {
-            alert('For faster uploads, please select an image smaller than 2MB');
-            input.value = '';
-            return;
-          }
-
-          selectedImageFile = file;
-          const reader = new FileReader();
-
-          reader.onload = function (e) {
-            document.getElementById('previewImage').src = e.target.result;
-            document.getElementById('imagePreview').classList.remove('hidden');
-            document.getElementById('fileName').textContent = file.name;
-
-            const fileSize = (file.size / 1024 / 1024).toFixed(2);
-            document.getElementById('fileSize').textContent = `${fileSize} MB`;
-          };
-
-          reader.readAsDataURL(file);
-        }
-      }
-
-      // Remove selected image
-      function removeImage() {
-        selectedImageFile = null;
-        document.getElementById('imageUpload').value = '';
-        document.getElementById('imagePreview').classList.add('hidden');
-        document.getElementById('fileName').textContent = '';
-      }
-
-      // Compress image before upload
-      function compressImage(file, maxWidth = 800, quality = 0.7) {
-        return new Promise(resolve => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          const img = new Image();
-
-          img.onload = function () {
-            let width = img.width;
-            let height = img.height;
-
-            if (width > maxWidth) {
-              height = (height * maxWidth) / width;
-              width = maxWidth;
-            }
-
-            canvas.width = width;
-            canvas.height = height;
-
-            ctx.drawImage(img, 0, 0, width, height);
-            canvas.toBlob(resolve, 'image/jpeg', quality);
-          };
-
-          img.src = URL.createObjectURL(file);
+          // Show corresponding content
+          const tabId = button.getAttribute('data-tab') + '-tab';
+          document.getElementById(tabId).classList.add('active');
         });
-      }
+      });
 
-      // Upload image to Firebase Storage with progress
-      async function uploadImage(file) {
-        try {
-          document.getElementById('uploadProgress').classList.remove('hidden');
+      // Content moderation demo
+      document.getElementById('submitBtn').addEventListener('click', () => {
+        const userInput = document.getElementById('userInput').value;
+        const outputMessage = document.getElementById('outputMessage');
 
-          let imageToUpload = file;
-          if (file.size > 500 * 1024) {
-            imageToUpload = await compressImage(file);
+        // Simple profanity filter (in a real app, use a more comprehensive library)
+        const blockedWords = ['asshole', 'fuck', 'porn', 'nigger', 'shit', 'cunt', 'dick', 'pussy'];
+        let filteredText = userInput;
+        let hasProfanity = false;
+
+        blockedWords.forEach(word => {
+          const regex = new RegExp(`\\b${word}\\b`, 'gi');
+          if (regex.test(filteredText)) {
+            hasProfanity = true;
+            filteredText = filteredText.replace(regex, '*'.repeat(word.length));
           }
+        });
 
-          const fileName = `posts/${currentUser.uid}/${Date.now()}.jpg`;
-          const storageRef = storage.ref().child(fileName);
-
-          const uploadTask = storageRef.put(imageToUpload);
-
-          return new Promise((resolve, reject) => {
-            uploadTask.on(
-              'state_changed',
-              snapshot => {
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                document.getElementById('progressBar').style.width = progress + '%';
-                document.getElementById('progressPercent').textContent = Math.round(progress) + '%';
-              },
-              error => {
-                document.getElementById('uploadProgress').classList.add('hidden');
-                reject(error);
-              },
-              async () => {
-                document.getElementById('uploadProgress').classList.add('hidden');
-                const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-                resolve(downloadURL);
-              }
-            );
-          });
-        } catch (error) {
-          document.getElementById('uploadProgress').classList.add('hidden');
-          throw error;
-        }
-      }
-
-      // Load posts from Firebase
-      async function loadPosts() {
-        const postsContainer = document.getElementById('postsContainer');
-        const loading = document.getElementById('loading');
-
-        try {
-          const snapshot = await db.collection('posts').orderBy('createdAt', 'desc').get();
-
-          loading.classList.add('hidden');
-          postsContainer.innerHTML = '';
-
-          if (snapshot.empty) {
-            postsContainer.innerHTML = `
-                        <div class="text-center py-12">
-                            <i class="fas fa-comments text-4xl text-gray-600 mb-4"></i>
-                            <h3 class="text-xl text-white mb-2">No posts yet</h3>
-                            <p class="text-gray-400 mb-4">Be the first to start a discussion!</p>
-                            <button onclick="createPost()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-                                Create First Post
-                            </button>
-                        </div>
-                    `;
-            return;
-          }
-
-          for (const doc of snapshot.docs) {
-            const post = doc.data();
-            await renderPost(doc.id, post);
-          }
-        } catch (error) {
-          console.error('❌ Error loading posts:', error);
-          loading.innerHTML = '<p class="text-red-400">Error loading posts</p>';
-        }
-      }
-
-      // Render a single post
-      async function renderPost(postId, post) {
-        const postsContainer = document.getElementById('postsContainer');
-
-        try {
-          // Get likes count
-          const likesSnapshot = await db.collection('posts').doc(postId).collection('likes').get();
-          const likesCount = likesSnapshot.size;
-          const userLiked = await db
-            .collection('posts')
-            .doc(postId)
-            .collection('likes')
-            .doc(currentUser.uid)
-            .get();
-
-          // Get comments
-          const commentsSnapshot = await db
-            .collection('posts')
-            .doc(postId)
-            .collection('comments')
-            .orderBy('createdAt', 'asc')
-            .get();
-
-          const commentsHtml = commentsSnapshot.docs
-            .map(commentDoc => {
-              const comment = commentDoc.data();
-              return `
-                        <div class="bg-gray-700 rounded-lg p-3 mb-2">
-                            <div class="flex justify-between items-start mb-1">
-                                <span class="font-semibold text-blue-400">${
-                                  comment.authorName
-                                }</span>
-                                <span class="text-xs text-gray-400">${formatTime(
-                                  comment.createdAt?.toDate()
-                                )}</span>
-                            </div>
-                            <p class="text-gray-300 text-sm">${comment.content}</p>
-                        </div>
-                    `;
-            })
-            .join('');
-
-          // Image HTML if post has an image
-          const imageHtml = post.imageUrl
-            ? `
-                    <div class="mb-4">
-                        <img src="${post.imageUrl}" alt="Post image" class="w-full rounded-lg max-h-96 object-cover cursor-pointer" onclick="openImageModal('${post.imageUrl}')">
+        if (hasProfanity) {
+          outputMessage.innerHTML = `
+                    <div class="alert warning">
+                        <strong>Content Blocked:</strong> Your message contains inappropriate content.
                     </div>
-                `
-            : '';
-
-          const postHtml = `
-                    <div class="bg-gray-800 rounded-lg shadow-lg post-item" data-post-id="${postId}">
-                        <div class="p-6">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                                        <span class="text-white font-bold text-sm">${
-                                          post.authorName?.charAt(0) || 'U'
-                                        }</span>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-white font-semibold">${post.authorName}</h3>
-                                        <p class="text-gray-400 text-sm">${formatTime(
-                                          post.createdAt?.toDate()
-                                        )}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <p class="text-gray-300 mb-4 leading-relaxed">${post.content}</p>
-                            
-                            ${imageHtml}
-                            
-                            <div class="border-t border-gray-700 pt-4">
-                                <div class="flex items-center justify-between text-sm">
-                                    <div class="flex space-x-6">
-                                        <button onclick="toggleLike('${postId}')" class="flex items-center space-x-2 ${
-            userLiked.exists ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
-          } transition-colors duration-200">
-                                            <i class="${
-                                              userLiked.exists ? 'fas text-red-500' : 'far'
-                                            } fa-heart"></i>
-                                            <span class="like-count">${likesCount}</span>
-                                        </button>
-                                        <button onclick="toggleComments('${postId}')" class="flex items-center space-x-2 text-gray-400 hover:text-blue-400 transition-colors duration-200">
-                                            <i class="far fa-comment"></i>
-                                            <span>${commentsSnapshot.size}</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <!-- Comments Section -->
-                                <div id="comments-${postId}" class="mt-4 hidden">
-                                    <div class="space-y-2 mb-4">
-                                        ${
-                                          commentsHtml ||
-                                          '<p class="text-gray-400 text-sm">No comments yet</p>'
-                                        }
-                                    </div>
-                                    <div class="flex space-x-2">
-                                        <input type="text" id="commentInput-${postId}" placeholder="Write a comment..." class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-400 focus:outline-none focus:border-blue-500">
-                                        <button onclick="addComment('${postId}')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">Post</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <p><strong>Filtered message:</strong> ${filteredText}</p>
+                    <p>This content would be rejected by our security rules.</p>
                 `;
-
-          postsContainer.innerHTML += postHtml;
-        } catch (error) {
-          console.error(`❌ Error rendering post ${postId}:`, error);
-        }
-      }
-
-      // Open image in modal
-      function openImageModal(imageUrl) {
-        const modalHtml = `
-                <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
-                    <div class="max-w-4xl max-h-full">
-                        <img src="${imageUrl}" alt="Full size" class="max-w-full max-h-full object-contain">
-                        <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300">
-                            <i class="fas fa-times"></i>
-                        </button>
+        } else {
+          outputMessage.innerHTML = `
+                    <div class="alert success">
+                        <strong>Content Approved:</strong> Your message passed our content filters.
                     </div>
-                </div>
-            `;
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-      }
-
-      function closeImageModal() {
-        const modal = document.getElementById('imageModal');
-        if (modal) modal.remove();
-      }
-
-      // Toggle like - UPDATED TO NOT RELOAD PAGE
-      async function toggleLike(postId) {
-        if (!currentUser) return;
-
-        try {
-          const likeRef = db
-            .collection('posts')
-            .doc(postId)
-            .collection('likes')
-            .doc(currentUser.uid);
-          const likeDoc = await likeRef.get();
-
-          // Find the like button and count for this post
-          const postElement = document.querySelector(`[data-post-id="${postId}"]`);
-          const likeButton = postElement.querySelector('button[onclick*="toggleLike"]');
-          const likeIcon = likeButton.querySelector('i');
-          const likeCount = likeButton.querySelector('.like-count');
-
-          if (likeDoc.exists) {
-            // Unlike - remove from Firebase
-            await likeRef.delete();
-
-            // Update UI instantly
-            likeIcon.classList.remove('fas', 'text-red-500');
-            likeIcon.classList.add('far');
-            likeButton.classList.remove('text-red-500');
-            likeButton.classList.add('text-gray-400', 'hover:text-red-500');
-
-            // Update count
-            const currentCount = parseInt(likeCount.textContent);
-            likeCount.textContent = currentCount - 1;
-          } else {
-            // Like - add to Firebase
-            await likeRef.set({
-              userId: currentUser.uid,
-              likedAt: new Date(),
-            });
-
-            // Update UI instantly
-            likeIcon.classList.remove('far');
-            likeIcon.classList.add('fas', 'text-red-500');
-            likeButton.classList.remove('text-gray-400', 'hover:text-red-500');
-            likeButton.classList.add('text-red-500');
-
-            // Update count
-            const currentCount = parseInt(likeCount.textContent);
-            likeCount.textContent = currentCount + 1;
-          }
-        } catch (error) {
-          console.error('❌ Error toggling like:', error);
-        }
-      }
-
-      // Toggle comments section
-      function toggleComments(postId) {
-        const commentsSection = document.getElementById(`comments-${postId}`);
-        commentsSection.classList.toggle('hidden');
-      }
-
-      // Add comment - UPDATED TO NOT RELOAD PAGE
-      async function addComment(postId) {
-        const commentInput = document.getElementById(`commentInput-${postId}`);
-        const content = commentInput.value.trim();
-
-        if (!content || !currentUser) return;
-
-        try {
-          // Add comment to Firebase
-          await db
-            .collection('posts')
-            .doc(postId)
-            .collection('comments')
-            .add({
-              content: content,
-              authorId: currentUser.uid,
-              authorName: currentUser.displayName || 'Anonymous',
-              createdAt: new Date(),
-            });
-
-          // Clear input
-          commentInput.value = '';
-
-          // Update comments section without reloading
-          await updateCommentsSection(postId);
-        } catch (error) {
-          console.error('❌ Error adding comment:', error);
-        }
-      }
-
-      // Update comments section without reloading entire page
-      async function updateCommentsSection(postId) {
-        try {
-          const commentsSnapshot = await db
-            .collection('posts')
-            .doc(postId)
-            .collection('comments')
-            .orderBy('createdAt', 'asc')
-            .get();
-
-          const commentsHtml = commentsSnapshot.docs
-            .map(commentDoc => {
-              const comment = commentDoc.data();
-              return `
-                        <div class="bg-gray-700 rounded-lg p-3 mb-2">
-                            <div class="flex justify-between items-start mb-1">
-                                <span class="font-semibold text-blue-400">${
-                                  comment.authorName
-                                }</span>
-                                <span class="text-xs text-gray-400">${formatTime(
-                                  comment.createdAt?.toDate()
-                                )}</span>
-                            </div>
-                            <p class="text-gray-300 text-sm">${comment.content}</p>
-                        </div>
-                    `;
-            })
-            .join('');
-
-          const commentsSection = document.getElementById(`comments-${postId}`);
-          const commentsContainer = commentsSection.querySelector('.space-y-2');
-          commentsContainer.innerHTML =
-            commentsHtml || '<p class="text-gray-400 text-sm">No comments yet</p>';
-        } catch (error) {
-          console.error('❌ Error updating comments:', error);
-        }
-      }
-
-      // Create post modal
-      function createPost() {
-        document.getElementById('createPostModal').classList.remove('hidden');
-      }
-
-      function closeCreatePost() {
-        document.getElementById('createPostModal').classList.add('hidden');
-        document.getElementById('postContent').value = '';
-        removeImage();
-        document.getElementById('uploadProgress').classList.add('hidden');
-      }
-
-      // Submit new post
-      async function submitPost() {
-        const content = document.getElementById('postContent').value.trim();
-
-        if (!content && !selectedImageFile) {
-          alert('Please add some text or an image to your post');
-          return;
-        }
-
-        if (!currentUser) return;
-
-        const submitBtn = document.getElementById('submitPostBtn');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Posting...';
-        submitBtn.disabled = true;
-
-        try {
-          let imageUrl = null;
-
-          if (selectedImageFile) {
-            imageUrl = await uploadImage(selectedImageFile);
-          }
-
-          await db.collection('posts').add({
-            content: content,
-            authorId: currentUser.uid,
-            authorName: currentUser.displayName || 'Anonymous',
-            imageUrl: imageUrl,
-            createdAt: new Date(),
-          });
-
-          closeCreatePost();
-          loadPosts(); // Only reload here for new posts
-        } catch (error) {
-          console.error('❌ Error creating post:', error);
-          alert('Error creating post. Please try again.');
-        } finally {
-          submitBtn.innerHTML = originalText;
-          submitBtn.disabled = false;
-        }
-      }
-
-      // Format time
-      function formatTime(date) {
-        if (!date) return 'Recently';
-        const now = new Date();
-        const diff = now - date;
-        const minutes = Math.floor(diff / 60000);
-        const hours = Math.floor(diff / 3600000);
-        const days = Math.floor(diff / 86400000);
-
-        if (minutes < 1) return 'Just now';
-        if (minutes < 60) return `${minutes}m ago`;
-        if (hours < 24) return `${hours}h ago`;
-        if (days < 7) return `${days}d ago`;
-        return date.toLocaleDateString();
-      }
-
-      // Logout
-      function logout() {
-        auth.signOut();
-      }
-
-      // Close modal when clicking outside
-      document.getElementById('createPostModal').addEventListener('click', function (e) {
-        if (e.target === this) {
-          closeCreatePost();
+                    <p><strong>Your message:</strong> ${filteredText}</p>
+                    <p>This content would be accepted by our security rules.</p>
+                `;
         }
       });
+
+      // Initialize with a sample inappropriate message
+      document.getElementById('userInput').value =
+        'This is a test message with some bad words like shit and porn.';
     </script>
   </body>
 </html>
