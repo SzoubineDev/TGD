@@ -14,6 +14,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
   </head>
   <body class="min-h-screen bg-gray-900">
     <!-- Navigation -->
@@ -45,11 +46,42 @@
     >
       <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
         <h3 class="text-xl font-bold text-white mb-4">Create New Post</h3>
+
+        <!-- Image Preview -->
+        <div id="imagePreview" class="mb-4 hidden">
+          <img id="previewImage" class="w-full rounded-lg max-h-48 object-cover" />
+          <button onclick="removeImage()" class="mt-2 text-red-400 hover:text-red-300 text-sm">
+            <i class="fas fa-times mr-1"></i>Remove Image
+          </button>
+        </div>
+
         <textarea
           id="postContent"
           placeholder="What's on your mind?"
           class="w-full h-32 bg-gray-700 border border-gray-600 rounded-lg p-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 mb-4"
         ></textarea>
+
+        <!-- Image Upload -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-300 mb-2">Add Image (Optional)</label>
+          <div class="flex items-center space-x-2">
+            <label
+              for="imageUpload"
+              class="cursor-pointer bg-gray-700 hover:bg-gray-600 text-gray-300 px-4 py-2 rounded-lg text-sm border border-gray-600"
+            >
+              <i class="fas fa-image mr-2"></i>Choose Image
+            </label>
+            <input
+              type="file"
+              id="imageUpload"
+              accept="image/*"
+              class="hidden"
+              onchange="previewImage(this)"
+            />
+            <span id="fileName" class="text-gray-400 text-sm"></span>
+          </div>
+        </div>
+
         <div class="flex justify-end space-x-3">
           <button onclick="closeCreatePost()" class="px-4 py-2 text-gray-400 hover:text-white">
             Cancel
@@ -58,7 +90,7 @@
             onclick="submitPost()"
             class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
           >
-            Post
+            <i class="fas fa-paper-plane mr-2"></i>Post
           </button>
         </div>
       </div>
@@ -107,7 +139,9 @@
 
       const auth = firebase.auth();
       const db = firebase.firestore();
+      const storage = firebase.storage();
       let currentUser = null;
+      let selectedImageFile = null;
 
       // Show debug information
       function showDebugInfo(message) {
@@ -132,6 +166,63 @@
         }
       });
 
+      // Preview selected image
+      function previewImage(input) {
+        const file = input.files[0];
+        if (file) {
+          // Validate file type
+          if (!file.type.startsWith('image/')) {
+            alert('Please select an image file');
+            input.value = '';
+            return;
+          }
+
+          // Validate file size (max 5MB)
+          if (file.size > 5 * 1024 * 1024) {
+            alert('Image size should be less than 5MB');
+            input.value = '';
+            return;
+          }
+
+          selectedImageFile = file;
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+            document.getElementById('previewImage').src = e.target.result;
+            document.getElementById('imagePreview').classList.remove('hidden');
+            document.getElementById('fileName').textContent = file.name;
+          };
+
+          reader.readAsDataURL(file);
+        }
+      }
+
+      // Remove selected image
+      function removeImage() {
+        selectedImageFile = null;
+        document.getElementById('imageUpload').value = '';
+        document.getElementById('imagePreview').classList.add('hidden');
+        document.getElementById('fileName').textContent = '';
+      }
+
+      // Upload image to Firebase Storage
+      async function uploadImage(file) {
+        try {
+          // Create a unique filename
+          const fileName = `posts/${currentUser.uid}/${Date.now()}_${file.name}`;
+          const storageRef = storage.ref().child(fileName);
+
+          // Upload the file
+          const snapshot = await storageRef.put(file);
+          const downloadURL = await snapshot.ref.getDownloadURL();
+
+          return downloadURL;
+        } catch (error) {
+          console.error('❌ Error uploading image:', error);
+          throw error;
+        }
+      }
+
       // Load posts from Firebase
       async function loadPosts() {
         const postsContainer = document.getElementById('postsContainer');
@@ -140,10 +231,6 @@
         console.log('🔄 Loading posts...');
 
         try {
-          // Test Firestore connection first
-          const testQuery = await db.collection('test').limit(1).get();
-          console.log('✅ Firestore connection successful');
-
           const snapshot = await db.collection('posts').orderBy('createdAt', 'desc').get();
 
           console.log(`✅ Loaded ${snapshot.size} posts`);
@@ -182,16 +269,6 @@
                         </button>
                     </div>
                 `;
-
-          // Show detailed debug info
-          showDebugInfo(`
-                    <strong>Error Details:</strong><br>
-                    ${error.message}<br><br>
-                    <strong>Possible Solutions:</strong><br>
-                    1. Check Firestore rules in Firebase Console<br>
-                    2. Make sure 'posts' collection exists<br>
-                    3. Check browser console for more details
-                `);
         }
       }
 
@@ -237,6 +314,15 @@
             })
             .join('');
 
+          // Image HTML if post has an image
+          const imageHtml = post.imageUrl
+            ? `
+                    <div class="mb-4">
+                        <img src="${post.imageUrl}" alt="Post image" class="w-full rounded-lg max-h-96 object-cover cursor-pointer" onclick="openImageModal('${post.imageUrl}')">
+                    </div>
+                `
+            : '';
+
           const postHtml = `
                     <div class="bg-gray-800 rounded-lg shadow-lg post-item" data-post-id="${postId}">
                         <div class="p-6">
@@ -257,6 +343,8 @@
                             </div>
                             
                             <p class="text-gray-300 mb-4 leading-relaxed">${post.content}</p>
+                            
+                            ${imageHtml}
                             
                             <div class="border-t border-gray-700 pt-4">
                                 <div class="flex items-center justify-between text-sm">
@@ -298,6 +386,26 @@
         } catch (error) {
           console.error(`❌ Error rendering post ${postId}:`, error);
         }
+      }
+
+      // Open image in modal (full screen view)
+      function openImageModal(imageUrl) {
+        const modalHtml = `
+                <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+                    <div class="max-w-4xl max-h-full">
+                        <img src="${imageUrl}" alt="Full size" class="max-w-full max-h-full object-contain">
+                        <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+      }
+
+      function closeImageModal() {
+        const modal = document.getElementById('imageModal');
+        if (modal) modal.remove();
       }
 
       // Toggle like
@@ -370,19 +478,41 @@
       function closeCreatePost() {
         document.getElementById('createPostModal').classList.add('hidden');
         document.getElementById('postContent').value = '';
+        removeImage(); // Reset image selection
       }
 
       // Submit new post
       async function submitPost() {
         const content = document.getElementById('postContent').value.trim();
 
-        if (!content || !currentUser) return;
+        if (!content && !selectedImageFile) {
+          alert('Please add some text or an image to your post');
+          return;
+        }
+
+        if (!currentUser) return;
+
+        const submitButton = document.querySelector(
+          '#createPostModal button[onclick="submitPost()"]'
+        );
+        const originalText = submitButton.innerHTML;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Posting...';
+        submitButton.disabled = true;
 
         try {
+          let imageUrl = null;
+
+          // Upload image if selected
+          if (selectedImageFile) {
+            imageUrl = await uploadImage(selectedImageFile);
+          }
+
+          // Create post in Firestore
           await db.collection('posts').add({
             content: content,
             authorId: currentUser.uid,
             authorName: currentUser.displayName || 'Anonymous',
+            imageUrl: imageUrl,
             createdAt: new Date(),
           });
 
@@ -391,6 +521,9 @@
         } catch (error) {
           console.error('❌ Error creating post:', error);
           alert('Error creating post: ' + error.message);
+        } finally {
+          submitButton.innerHTML = originalText;
+          submitButton.disabled = false;
         }
       }
 
