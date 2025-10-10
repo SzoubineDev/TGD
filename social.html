@@ -1,491 +1,712 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Secure Debate Platform</title>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/profanity-filter@1.0.0/lib/profanity-filter.min.js"></script>
-    <style>
-      :root {
-        --primary: #1a365d;
-        --primary-light: #2d3748;
-        --secondary: #ecc94b;
-        --gray-900: #1a202c;
-        --white: #ffffff;
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      }
-
-      body {
-        background-color: #f7fafc;
-        color: var(--gray-900);
-        line-height: 1.6;
-      }
-
-      .security-section {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-        padding: 2rem;
-        color: var(--white);
-        border-radius: 0 0 20px 20px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
-      }
-
-      .security-container {
-        max-width: 1200px;
-        margin: 0 auto;
-      }
-
-      .security-header {
-        text-align: center;
-        margin-bottom: 2rem;
-      }
-
-      .security-header h1 {
-        font-size: 2.5rem;
-        margin-bottom: 0.5rem;
-      }
-
-      .security-header p {
-        opacity: 0.9;
-        font-size: 1.1rem;
-      }
-
-      .security-features {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-      }
-
-      .feature-card {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 1.5rem;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
-
-      .feature-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-      }
-
-      .feature-card h3 {
-        font-size: 1.3rem;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .feature-card h3 i {
-        color: var(--secondary);
-      }
-
-      .feature-card ul {
-        list-style-type: none;
-      }
-
-      .feature-card li {
-        margin-bottom: 0.5rem;
-        padding-left: 1.5rem;
-        position: relative;
-      }
-
-      .feature-card li:before {
-        content: '✓';
-        position: absolute;
-        left: 0;
-        color: var(--secondary);
-        font-weight: bold;
-      }
-
-      .demo-section {
-        background: var(--white);
-        border-radius: 12px;
-        padding: 2rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
-      }
-
-      .demo-section h2 {
-        color: var(--primary);
-        margin-bottom: 1.5rem;
-        text-align: center;
-      }
-
-      .demo-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
-      }
-
-      @media (max-width: 768px) {
-        .demo-container {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .input-area,
-      .output-area {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .input-area textarea {
-        height: 150px;
-        padding: 1rem;
-        border: 1px solid #cbd5e0;
-        border-radius: 8px;
-        resize: vertical;
-        margin-bottom: 1rem;
-        font-size: 1rem;
-      }
-
-      .input-area button {
-        background: var(--secondary);
-        color: var(--gray-900);
-        border: none;
-        padding: 0.8rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.3s ease;
-      }
-
-      .input-area button:hover {
-        background: #d69e2e;
-      }
-
-      .output-area .message {
-        background: #edf2f7;
-        padding: 1rem;
-        border-radius: 8px;
-        min-height: 150px;
-        border: 1px dashed #cbd5e0;
-      }
-
-      .rules-section {
-        background: var(--white);
-        border-radius: 12px;
-        padding: 2rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      }
-
-      .rules-section h2 {
-        color: var(--primary);
-        margin-bottom: 1.5rem;
-        text-align: center;
-      }
-
-      .rules-tabs {
-        display: flex;
-        border-bottom: 1px solid #e2e8f0;
-        margin-bottom: 1.5rem;
-      }
-
-      .tab-button {
-        padding: 0.8rem 1.5rem;
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-weight: 600;
-        color: #718096;
-        border-bottom: 3px solid transparent;
-        transition: all 0.3s ease;
-      }
-
-      .tab-button.active {
-        color: var(--primary);
-        border-bottom: 3px solid var(--secondary);
-      }
-
-      .tab-content {
-        display: none;
-      }
-
-      .tab-content.active {
-        display: block;
-      }
-
-      .code-block {
-        background: #2d3748;
-        color: #e2e8f0;
-        padding: 1.5rem;
-        border-radius: 8px;
-        overflow-x: auto;
-        font-family: 'Courier New', monospace;
-        font-size: 0.9rem;
-        line-height: 1.5;
-      }
-
-      .alert {
-        padding: 1rem;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .alert.warning {
-        background: #fed7d7;
-        color: #c53030;
-        border-left: 4px solid #fc8181;
-      }
-
-      .alert.success {
-        background: #c6f6d5;
-        color: #2d7d32;
-        border-left: 4px solid #68d391;
-      }
-
-      .status-indicator {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: 600;
-        margin-bottom: 1rem;
-      }
-
-      .status-indicator.secure {
-        background: #c6f6d5;
-        color: #2d7d32;
-      }
-
-      .status-indicator.insecure {
-        background: #fed7d7;
-        color: #c53030;
-      }
-
-      .status-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-      }
-
-      .status-dot.secure {
-        background: #2d7d32;
-      }
-
-      .status-dot.insecure {
-        background: #c53030;
-      }
-    </style>
-  </head>
-  <body>
-    <section class="security-section">
-      <div class="security-container">
-        <div class="security-header">
-          <h1>Firebase Security Implementation</h1>
-          <p>Protect your application from unauthorized content and malicious users</p>
-        </div>
-
-        <div class="security-features">
-          <div class="feature-card">
-            <h3><i>🔒</i> Authentication Security</h3>
-            <ul>
-              <li>User authentication required for write operations</li>
-              <li>Email verification for sensitive actions</li>
-              <li>Role-based access control</li>
-              <li>Session management and timeout</li>
-            </ul>
-          </div>
-
-          <div class="feature-card">
-            <h3><i>🛡️</i> Firestore Security Rules</h3>
-            <ul>
-              <li>Content validation rules</li>
-              <li>User ownership verification</li>
-              <li>Rate limiting for writes</li>
-              <li>Prevention of mass deletions</li>
-            </ul>
-          </div>
-
-          <div class="feature-card">
-            <h3><i>🚫</i> Content Moderation</h3>
-            <ul>
-              <li>Profanity filtering</li>
-              <li>Image content scanning</li>
-              <li>Report and flagging system</li>
-              <li>Admin moderation panel</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="status-indicator secure">
-          <div class="status-dot secure"></div>
-          Security Status: Protected
-        </div>
-      </div>
-    </section>
-
-    <div class="security-container">
-      <section class="demo-section">
-        <h2>Content Moderation Demo</h2>
-        <div class="demo-container">
-          <div class="input-area">
-            <textarea id="userInput" placeholder="Try posting inappropriate content here...">
-This is a test message with some bad words.</textarea
-            >
-            <button id="submitBtn">Check Content</button>
-          </div>
-          <div class="output-area">
-            <div class="message" id="outputMessage">
-              Safe content will appear here. Try posting something inappropriate to see the filter
-              in action.
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Great Debaters - Community</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+</head>
+<body class="min-h-screen bg-gray-900">
+    <!-- Navigation -->
+    <nav class="bg-gray-800 border-b border-gray-700 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <button id="mobileMenuButton" class="lg:hidden text-gray-400 hover:text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <h1 class="text-xl font-bold text-white">The Great Debaters</h1>
             </div>
-          </div>
+            <div class="flex items-center space-x-3">
+                <span class="text-gray-300 text-sm hidden sm:block" id="userWelcome">Welcome!</span>
+                <button id="newPostBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium">
+                    <i class="fas fa-plus mr-1"></i>
+                    <span class="hidden sm:inline">New Post</span>
+                </button>
+                <button onclick="logout()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
         </div>
-      </section>
+    </nav>
 
-      <section class="rules-section">
-        <h2>Firebase Security Rules</h2>
+    <!-- Mobile Sidebar -->
+    <div id="mobileSidebar" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden">
+        <div class="fixed left-0 top-0 h-full w-80 bg-gray-800 p-6 transform -translate-x-full transition-transform duration-300">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-white font-semibold">Menu</h3>
+                <button id="closeMobileMenu" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- User Info -->
+            <div class="mb-6 p-4 bg-gray-700 rounded-lg">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                        ${currentUser?.displayName?.charAt(0) || 'U'}
+                    </div>
+                    <div>
+                        <p class="text-white font-semibold text-sm">${currentUser?.displayName || 'User'}</p>
+                        <p class="text-gray-400 text-xs">${isAdmin ? 'Admin' : 'Member'}</p>
+                    </div>
+                </div>
+            </div>
 
-        <div class="rules-tabs">
-          <button class="tab-button active" data-tab="firestore">Firestore Rules</button>
-          <button class="tab-button" data-tab="storage">Storage Rules</button>
-          <button class="tab-button" data-tab="auth">Authentication</button>
+            <!-- Mobile Menu Items -->
+            <div class="space-y-2">
+                <button onclick="createPost()" class="w-full text-left px-4 py-3 text-white hover:bg-gray-700 rounded-lg flex items-center space-x-3">
+                    <i class="fas fa-plus w-5"></i>
+                    <span>Create Post</span>
+                </button>
+                <button onclick="loadPosts()" class="w-full text-left px-4 py-3 text-white hover:bg-gray-700 rounded-lg flex items-center space-x-3">
+                    <i class="fas fa-home w-5"></i>
+                    <span>Home Feed</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Post Modal -->
+    <div id="createPostModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-lg p-4 sm:p-6 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold text-white mb-4">Create New Post</h3>
+            
+            <!-- Admin Only Message -->
+            <div id="adminOnlyMessage" class="bg-yellow-900 border border-yellow-700 rounded-lg p-3 mb-4 text-yellow-200 text-sm hidden">
+                <i class="fas fa-shield-alt mr-2"></i>
+                Only admins can create posts
+            </div>
+            
+            <!-- Image Preview -->
+            <div id="imagePreview" class="mb-4 hidden">
+                <img id="previewImage" class="w-full rounded-lg max-h-48 object-cover">
+                <div class="flex justify-between items-center mt-2">
+                    <span id="fileSize" class="text-gray-400 text-sm"></span>
+                    <button onclick="removeImage()" class="text-red-400 hover:text-red-300 text-sm">
+                        <i class="fas fa-times mr-1"></i>Remove
+                    </button>
+                </div>
+            </div>
+            
+            <textarea id="postContent" placeholder="What's on your mind? Start a debate..." class="w-full h-32 bg-gray-700 border border-gray-600 rounded-lg p-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 mb-4 resize-none"></textarea>
+            
+            <!-- Image Upload -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Add Image (Optional)</label>
+                <div class="flex items-center space-x-2">
+                    <label for="imageUpload" class="cursor-pointer bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-2 rounded-lg text-sm border border-gray-600 flex items-center space-x-2">
+                        <i class="fas fa-image"></i>
+                        <span class="hidden sm:inline">Choose Image</span>
+                    </label>
+                    <input type="file" id="imageUpload" accept="image/*" class="hidden" onchange="previewImage(this)">
+                    <span id="fileName" class="text-gray-400 text-sm truncate flex-1"></span>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeCreatePost()" class="px-4 py-2 text-gray-400 hover:text-white text-sm">Cancel</button>
+                <button onclick="submitPost()" id="submitPostBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fas fa-paper-plane mr-2"></i>Post
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto p-3 sm:p-4 lg:p-6">
+        <!-- Mobile Admin Badge -->
+        <div id="mobileAdminBadge" class="lg:hidden bg-blue-900 border border-blue-700 rounded-lg p-3 mb-4 text-blue-200 text-sm text-center">
+            <i class="fas fa-shield-alt mr-2"></i>
+            <span id="adminStatusText">Loading...</span>
         </div>
 
-        <div class="tab-content active" id="firestore-tab">
-          <div class="alert warning">
-            <strong>Warning:</strong> Never rely solely on client-side validation. Always implement
-            server-side security rules.
-          </div>
+        <div class="flex flex-col lg:flex-row gap-4 lg:gap-6">
+            <!-- Sidebar - Hidden on mobile, shown on desktop -->
+            <div class="hidden lg:block w-80 flex-shrink-0">
+                <!-- User Info -->
+                <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                            ${currentUser?.displayName?.charAt(0) || 'U'}
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">${currentUser?.displayName || 'User'}</p>
+                            <p class="text-gray-400 text-sm" id="desktopAdminStatus">Loading...</p>
+                        </div>
+                    </div>
+                </div>
 
-          <div class="code-block">
-            // Firestore Security Rules rules_version = '2'; service cloud.firestore { match
-            /databases/{database}/documents { // Posts collection - users can only read approved
-            content match /posts/{postId} { allow read: if resource.data.approved == true; allow
-            create: if request.auth != null && request.auth.token.email_verified == true &&
-            request.resource.data.keys().hasAll(['title', 'content', 'authorId']) &&
-            request.resource.data.authorId == request.auth.uid && request.resource.data.title is
-            string && request.resource.data.title.size() >= 5 && request.resource.data.title.size()
-            <= 100 && request.resource.data.content is string &&
-            request.resource.data.content.size() >= 10 && request.resource.data.content.size() <=
-            5000 &&
-            !request.resource.data.content.matches('(?i).*\\b(asshole|fuck|porn|nigger|shit|cunt)\\b.*');
-            allow update, delete: if request.auth != null && request.auth.uid ==
-            resource.data.authorId && request.resource.data.approved == false; } // Admin users have
-            full access match /{document=**} { allow read, write: if request.auth != null &&
-            get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true; }
-            } }
-          </div>
-        </div>
+                <!-- Admin Panel -->
+                <div id="adminPanel" class="bg-gray-800 rounded-lg p-6 mb-6 hidden">
+                    <h3 class="text-white font-semibold mb-4 flex items-center">
+                        <i class="fas fa-shield-alt mr-2 text-blue-400"></i>
+                        Admin Panel
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Admin Status:</span>
+                            <span class="text-green-400 font-semibold">Active</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Can Post:</span>
+                            <span class="text-green-400">✓</span>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="tab-content" id="storage-tab">
-          <div class="code-block">
-            // Firebase Storage Rules rules_version = '2'; service firebase.storage { match
-            /b/{bucket}/o { // User uploads - only images under 5MB allowed match
-            /uploads/{userId}/{allPaths=**} { allow read: if request.auth != null; allow write: if
-            request.auth != null && request.auth.uid == userId && request.resource.size < 5 * 1024 *
-            1024 && request.resource.contentType.matches('image/.*') &&
-            request.resource.name.matches('.*\\.(jpg|jpeg|png|gif)$'); } // Public content - anyone
-            can read approved content match /public/{allPaths=**} { allow read: if
-            resource.metadata.approved == 'true'; allow write: if request.auth != null &&
-            get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true; }
-            } }
-          </div>
-        </div>
+                <!-- Community Stats -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h3 class="text-white font-semibold mb-4">📊 Community Stats</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Total Members</span>
+                            <span class="text-white" id="totalMembers">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Total Posts</span>
+                            <span class="text-white" id="totalPosts">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Your Role</span>
+                            <span class="text-blue-400" id="userRole">Member</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <div class="tab-content" id="auth-tab">
-          <div class="code-block">
-            // Authentication Security Implementation (JavaScript) import { initializeApp } from
-            'firebase/app'; import { getAuth, createUserWithEmailAndPassword,
-            signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut } from
-            'firebase/auth'; const firebaseConfig = { // Your Firebase config here }; const app =
-            initializeApp(firebaseConfig); const auth = getAuth(app); // Only allow verified users
-            to post content function canUserPost() { const user = auth.currentUser; return user &&
-            user.emailVerified; } // Require email verification for new users async function
-            registerUser(email, password) { try { const userCredential = await
-            createUserWithEmailAndPassword(auth, email, password); await
-            sendEmailVerification(userCredential.user); // Redirect to verification page
-            alert('Please verify your email before posting content.'); } catch (error) {
-            console.error('Registration error:', error); alert('Registration failed: ' +
-            error.message); } } // Monitor authentication state onAuthStateChanged(auth, (user) => {
-            if (user) { if (user.emailVerified) { // User is verified, enable posting
-            document.getElementById('postButton').disabled = false; } else { // User not verified,
-            disable posting document.getElementById('postButton').disabled = true; alert('Please
-            verify your email to post content.'); } } else { // User is signed out
-            document.getElementById('postButton').disabled = true; } });
-          </div>
+            <!-- Posts Feed -->
+            <div class="flex-1 min-w-0"> <!-- min-w-0 prevents flex item from overflowing -->
+                <!-- Posts will be loaded here -->
+                <div id="postsContainer"></div>
+                
+                <!-- Loading -->
+                <div id="loading" class="text-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                    <p class="text-gray-400 mt-2">Loading posts...</p>
+                </div>
+
+                <!-- No Posts Message -->
+                <div id="noPosts" class="text-center py-12 hidden">
+                    <i class="fas fa-comments text-4xl text-gray-600 mb-4"></i>
+                    <h3 class="text-xl text-white mb-2">No posts yet</h3>
+                    <p class="text-gray-400 mb-4">Be the first to start a discussion!</p>
+                    <button onclick="createPost()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                        Create First Post
+                    </button>
+                </div>
+            </div>
         </div>
-      </section>
     </div>
 
     <script>
-      // Tab functionality
-      document.querySelectorAll('.tab-button').forEach(button => {
-        button.addEventListener('click', () => {
-          // Remove active class from all buttons and content
-          document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-          document
-            .querySelectorAll('.tab-content')
-            .forEach(content => content.classList.remove('active'));
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC6CtIlRko2CFf0owSvUlZMeVtkVDMy2BU",
+            authDomain: "the-gd-fste-ce113.firebaseapp.com",
+            projectId: "the-gd-fste-ce113",
+            storageBucket: "the-gd-fste-ce113.appspot.com",
+            messagingSenderId: "485167566903",
+            appId: "1:485167566903:web:9e5dfacd7e34741cf96fb2"
+        };
 
-          // Add active class to clicked button
-          button.classList.add('active');
-
-          // Show corresponding content
-          const tabId = button.getAttribute('data-tab') + '-tab';
-          document.getElementById(tabId).classList.add('active');
-        });
-      });
-
-      // Content moderation demo
-      document.getElementById('submitBtn').addEventListener('click', () => {
-        const userInput = document.getElementById('userInput').value;
-        const outputMessage = document.getElementById('outputMessage');
-
-        // Simple profanity filter (in a real app, use a more comprehensive library)
-        const blockedWords = ['asshole', 'fuck', 'porn', 'nigger', 'shit', 'cunt', 'dick', 'pussy'];
-        let filteredText = userInput;
-        let hasProfanity = false;
-
-        blockedWords.forEach(word => {
-          const regex = new RegExp(`\\b${word}\\b`, 'gi');
-          if (regex.test(filteredText)) {
-            hasProfanity = true;
-            filteredText = filteredText.replace(regex, '*'.repeat(word.length));
-          }
-        });
-
-        if (hasProfanity) {
-          outputMessage.innerHTML = `
-                    <div class="alert warning">
-                        <strong>Content Blocked:</strong> Your message contains inappropriate content.
-                    </div>
-                    <p><strong>Filtered message:</strong> ${filteredText}</p>
-                    <p>This content would be rejected by our security rules.</p>
-                `;
-        } else {
-          outputMessage.innerHTML = `
-                    <div class="alert success">
-                        <strong>Content Approved:</strong> Your message passed our content filters.
-                    </div>
-                    <p><strong>Your message:</strong> ${filteredText}</p>
-                    <p>This content would be accepted by our security rules.</p>
-                `;
+        // Initialize Firebase
+        try {
+            firebase.initializeApp(firebaseConfig);
+        } catch (error) {
+            console.error("Firebase initialization error:", error);
         }
-      });
 
-      // Initialize with a sample inappropriate message
-      document.getElementById('userInput').value =
-        'This is a test message with some bad words like shit and porn.';
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        let currentUser = null;
+        let selectedImageFile = null;
+        let isAdmin = false;
+        const adminEmails = [
+            's.zoubine@edu.umi.ac.ma',
+            'fatimaezzahraelmouhaddine@gmail.com'
+        ];
+
+        // Check authentication
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = 'joinForm.html';
+            } else {
+                currentUser = user;
+                isAdmin = adminEmails.includes(user.email);
+                
+                // Update UI based on admin status
+                updateAdminUI();
+                document.getElementById('userWelcome').textContent = `Welcome, ${user.displayName || user.email.split('@')[0]}!`;
+                loadPosts();
+                loadCommunityStats();
+                
+                // Update user info in mobile sidebar
+                updateMobileUserInfo();
+            }
+        });
+
+        // Update UI based on admin status
+        function updateAdminUI() {
+            const adminPanel = document.getElementById('adminPanel');
+            const adminStatusText = document.getElementById('adminStatusText');
+            const desktopAdminStatus = document.getElementById('desktopAdminStatus');
+            const userRole = document.getElementById('userRole');
+            const newPostBtn = document.getElementById('newPostBtn');
+            
+            if (isAdmin) {
+                adminPanel?.classList.remove('hidden');
+                adminStatusText.textContent = 'Admin - You can create posts';
+                desktopAdminStatus.textContent = 'Admin';
+                userRole.textContent = 'Admin';
+                userRole.className = 'text-green-400';
+                newPostBtn.disabled = false;
+            } else {
+                adminPanel?.classList.add('hidden');
+                adminStatusText.textContent = 'Member - Read only access';
+                desktopAdminStatus.textContent = 'Member';
+                userRole.textContent = 'Member';
+                userRole.className = 'text-blue-400';
+                newPostBtn.disabled = true;
+                newPostBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // Update mobile user info
+        function updateMobileUserInfo() {
+            const userInitial = currentUser?.displayName?.charAt(0) || 'U';
+            const userElements = document.querySelectorAll('.user-initial, .user-name');
+            userElements.forEach(el => {
+                if (el.classList.contains('user-initial')) {
+                    el.textContent = userInitial;
+                } else if (el.classList.contains('user-name')) {
+                    el.textContent = currentUser?.displayName || 'User';
+                }
+            });
+        }
+
+        // Mobile menu functionality
+        document.getElementById('mobileMenuButton').addEventListener('click', function() {
+            document.getElementById('mobileSidebar').classList.remove('hidden');
+            setTimeout(() => {
+                document.querySelector('#mobileSidebar > div').classList.remove('-translate-x-full');
+            }, 50);
+        });
+
+        document.getElementById('closeMobileMenu').addEventListener('click', function() {
+            document.querySelector('#mobileSidebar > div').classList.add('-translate-x-full');
+            setTimeout(() => {
+                document.getElementById('mobileSidebar').classList.add('hidden');
+            }, 300);
+        });
+
+        // Close mobile menu when clicking outside
+        document.getElementById('mobileSidebar').addEventListener('click', function(e) {
+            if (e.target === this) {
+                document.querySelector('#mobileSidebar > div').classList.add('-translate-x-full');
+                setTimeout(() => {
+                    this.classList.add('hidden');
+                }, 300);
+            }
+        });
+
+        // Load community stats
+        async function loadCommunityStats() {
+            try {
+                const postsSnapshot = await db.collection('posts').get();
+                const membersSnapshot = await db.collection('members').get();
+                
+                document.getElementById('totalPosts').textContent = postsSnapshot.size;
+                document.getElementById('totalMembers').textContent = membersSnapshot.size;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Preview selected image
+        function previewImage(input) {
+            const file = input.files[0];
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select an image file');
+                    input.value = '';
+                    return;
+                }
+                
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Please select an image smaller than 2MB');
+                    input.value = '';
+                    return;
+                }
+                
+                selectedImageFile = file;
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                    document.getElementById('fileName').textContent = file.name;
+                    
+                    const fileSize = (file.size / 1024 / 1024).toFixed(2);
+                    document.getElementById('fileSize').textContent = `${fileSize} MB`;
+                }
+                
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Remove selected image
+        function removeImage() {
+            selectedImageFile = null;
+            document.getElementById('imageUpload').value = '';
+            document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('fileName').textContent = '';
+        }
+
+        // Load posts from Firebase
+        async function loadPosts() {
+            const postsContainer = document.getElementById('postsContainer');
+            const loading = document.getElementById('loading');
+            const noPosts = document.getElementById('noPosts');
+            
+            try {
+                const snapshot = await db.collection('posts')
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                
+                loading.classList.add('hidden');
+                postsContainer.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    noPosts.classList.remove('hidden');
+                    return;
+                }
+                
+                noPosts.classList.add('hidden');
+                
+                for (const doc of snapshot.docs) {
+                    const post = doc.data();
+                    await renderPost(doc.id, post);
+                }
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                loading.innerHTML = '<p class="text-red-400 text-center">Error loading posts</p>';
+            }
+        }
+
+        // Render a single post
+        async function renderPost(postId, post) {
+            const postsContainer = document.getElementById('postsContainer');
+            
+            try {
+                // Get likes count
+                const likesSnapshot = await db.collection('posts').doc(postId).collection('likes').get();
+                const likesCount = likesSnapshot.size;
+                const userLiked = currentUser ? await db.collection('posts').doc(postId).collection('likes').doc(currentUser.uid).get() : { exists: false };
+                
+                // Get comments
+                const commentsSnapshot = await db.collection('posts').doc(postId).collection('comments')
+                    .orderBy('createdAt', 'asc')
+                    .get();
+                
+                const commentsHtml = commentsSnapshot.docs.map(commentDoc => {
+                    const comment = commentDoc.data();
+                    return `
+                        <div class="bg-gray-700 rounded-lg p-3 mb-2">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="font-semibold text-blue-400 text-sm">${comment.authorName}</span>
+                                <span class="text-xs text-gray-400">${formatTime(comment.createdAt?.toDate())}</span>
+                            </div>
+                            <p class="text-gray-300 text-sm">${comment.content}</p>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Image HTML if post has an image
+                const imageHtml = post.imageUrl ? `
+                    <div class="mb-4">
+                        <img src="${post.imageUrl}" alt="Post image" class="w-full rounded-lg max-h-96 object-cover cursor-pointer" onclick="openImageModal('${post.imageUrl}')">
+                    </div>
+                ` : '';
+                
+                const postHtml = `
+                    <div class="bg-gray-800 rounded-lg shadow-lg mb-4 sm:mb-6" data-post-id="${postId}">
+                        <div class="p-4 sm:p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                                        <span class="text-white font-bold text-sm">${post.authorName?.charAt(0) || 'U'}</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-white font-semibold text-sm sm:text-base">${post.authorName}</h3>
+                                        <p class="text-gray-400 text-xs sm:text-sm">${formatTime(post.createdAt?.toDate())}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <p class="text-gray-300 mb-4 leading-relaxed text-sm sm:text-base">${post.content}</p>
+                            
+                            ${imageHtml}
+                            
+                            <div class="border-t border-gray-700 pt-4">
+                                <div class="flex items-center justify-between text-sm">
+                                    <div class="flex space-x-4 sm:space-x-6">
+                                        <button onclick="toggleLike('${postId}')" class="flex items-center space-x-2 ${userLiked.exists ? 'text-red-500' : 'text-gray-400 hover:text-red-500'} transition-colors duration-200">
+                                            <i class="${userLiked.exists ? 'fas text-red-500' : 'far'} fa-heart"></i>
+                                            <span class="like-count text-xs sm:text-sm">${likesCount}</span>
+                                        </button>
+                                        <button onclick="toggleComments('${postId}')" class="flex items-center space-x-2 text-gray-400 hover:text-blue-400 transition-colors duration-200">
+                                            <i class="far fa-comment"></i>
+                                            <span class="text-xs sm:text-sm">${commentsSnapshot.size}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Comments Section -->
+                                <div id="comments-${postId}" class="mt-4 hidden">
+                                    <div class="space-y-2 mb-4 max-h-60 overflow-y-auto">
+                                        ${commentsHtml || '<p class="text-gray-400 text-sm text-center py-4">No comments yet</p>'}
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <input type="text" id="commentInput-${postId}" placeholder="Write a comment..." class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-400 focus:outline-none focus:border-blue-500">
+                                        <button onclick="addComment('${postId}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm">Post</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                postsContainer.innerHTML += postHtml;
+            } catch (error) {
+                console.error(`Error rendering post ${postId}:`, error);
+            }
+        }
+
+        // Toggle like
+        async function toggleLike(postId) {
+            if (!currentUser) return;
+            
+            try {
+                const likeRef = db.collection('posts').doc(postId).collection('likes').doc(currentUser.uid);
+                const likeDoc = await likeRef.get();
+                
+                const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+                const likeButton = postElement.querySelector('button[onclick*="toggleLike"]');
+                const likeIcon = likeButton.querySelector('i');
+                const likeCount = likeButton.querySelector('.like-count');
+                
+                if (likeDoc.exists) {
+                    await likeRef.delete();
+                    likeIcon.classList.remove('fas', 'text-red-500');
+                    likeIcon.classList.add('far');
+                    likeButton.classList.remove('text-red-500');
+                    likeButton.classList.add('text-gray-400', 'hover:text-red-500');
+                    const currentCount = parseInt(likeCount.textContent);
+                    likeCount.textContent = currentCount - 1;
+                } else {
+                    await likeRef.set({
+                        userId: currentUser.uid,
+                        likedAt: new Date()
+                    });
+                    likeIcon.classList.remove('far');
+                    likeIcon.classList.add('fas', 'text-red-500');
+                    likeButton.classList.remove('text-gray-400', 'hover:text-red-500');
+                    likeButton.classList.add('text-red-500');
+                    const currentCount = parseInt(likeCount.textContent);
+                    likeCount.textContent = currentCount + 1;
+                }
+            } catch (error) {
+                console.error('Error toggling like:', error);
+            }
+        }
+
+        // Toggle comments section
+        function toggleComments(postId) {
+            const commentsSection = document.getElementById(`comments-${postId}`);
+            commentsSection.classList.toggle('hidden');
+        }
+
+        // Add comment
+        async function addComment(postId) {
+            const commentInput = document.getElementById(`commentInput-${postId}`);
+            const content = commentInput.value.trim();
+            
+            if (!content || !currentUser) return;
+            
+            try {
+                await db.collection('posts').doc(postId).collection('comments').add({
+                    content: content,
+                    authorId: currentUser.uid,
+                    authorName: currentUser.displayName || 'Anonymous',
+                    createdAt: new Date()
+                });
+                
+                commentInput.value = '';
+                await updateCommentsSection(postId);
+            } catch (error) {
+                console.error('Error adding comment:', error);
+            }
+        }
+
+        // Update comments section
+        async function updateCommentsSection(postId) {
+            try {
+                const commentsSnapshot = await db.collection('posts').doc(postId).collection('comments')
+                    .orderBy('createdAt', 'asc')
+                    .get();
+                
+                const commentsHtml = commentsSnapshot.docs.map(commentDoc => {
+                    const comment = commentDoc.data();
+                    return `
+                        <div class="bg-gray-700 rounded-lg p-3 mb-2">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="font-semibold text-blue-400 text-sm">${comment.authorName}</span>
+                                <span class="text-xs text-gray-400">${formatTime(comment.createdAt?.toDate())}</span>
+                            </div>
+                            <p class="text-gray-300 text-sm">${comment.content}</p>
+                        </div>
+                    `;
+                }).join('');
+                
+                const commentsSection = document.getElementById(`comments-${postId}`);
+                const commentsContainer = commentsSection.querySelector('.space-y-2');
+                commentsContainer.innerHTML = commentsHtml || '<p class="text-gray-400 text-sm text-center py-4">No comments yet</p>';
+            } catch (error) {
+                console.error('Error updating comments:', error);
+            }
+        }
+
+        // Create post modal
+        function createPost() {
+            const modal = document.getElementById('createPostModal');
+            const adminOnlyMessage = document.getElementById('adminOnlyMessage');
+            const submitBtn = document.getElementById('submitPostBtn');
+            
+            if (!isAdmin) {
+                adminOnlyMessage.classList.remove('hidden');
+                submitBtn.disabled = true;
+            } else {
+                adminOnlyMessage.classList.add('hidden');
+                submitBtn.disabled = false;
+            }
+            
+            modal.classList.remove('hidden');
+            document.getElementById('mobileSidebar').classList.add('hidden');
+        }
+
+        function closeCreatePost() {
+            document.getElementById('createPostModal').classList.add('hidden');
+            document.getElementById('postContent').value = '';
+            removeImage();
+        }
+
+        // Submit new post (Admin only)
+        async function submitPost() {
+            if (!isAdmin) {
+                alert('Only admins can create posts');
+                return;
+            }
+            
+            const content = document.getElementById('postContent').value.trim();
+            
+            if (!content && !selectedImageFile) {
+                alert('Please add some text or an image to your post');
+                return;
+            }
+            
+            if (!currentUser) return;
+            
+            const submitBtn = document.getElementById('submitPostBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Posting...';
+            submitBtn.disabled = true;
+            
+            try {
+                let imageUrl = null;
+                
+                if (selectedImageFile) {
+                    // Simple upload without compression for now
+                    const fileName = `posts/${currentUser.uid}/${Date.now()}.jpg`;
+                    const storageRef = storage.ref().child(fileName);
+                    await storageRef.put(selectedImageFile);
+                    imageUrl = await storageRef.getDownloadURL();
+                }
+                
+                await db.collection('posts').add({
+                    content: content,
+                    authorId: currentUser.uid,
+                    authorName: currentUser.displayName || 'Admin',
+                    imageUrl: imageUrl,
+                    createdAt: new Date()
+                });
+                
+                closeCreatePost();
+                loadPosts();
+                loadCommunityStats();
+            } catch (error) {
+                console.error('Error creating post:', error);
+                alert('Error creating post: ' + error.message);
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Format time
+        function formatTime(date) {
+            if (!date) return 'Recently';
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return 'Just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days < 7) return `${days}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        // Logout
+        function logout() {
+            auth.signOut();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('createPostModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCreatePost();
+            }
+        });
+
+        // Open image in modal
+        function openImageModal(imageUrl) {
+            const modalHtml = `
+                <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
+                    <div class="max-w-4xl max-h-full">
+                        <img src="${imageUrl}" alt="Full size" class="max-w-full max-h-full object-contain">
+                        <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            if (modal) modal.remove();
+        }
     </script>
-  </body>
+</body>
 </html>
