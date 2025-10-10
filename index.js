@@ -466,9 +466,9 @@ const ALL_TRANSLATIONS = {
       'media-manager-desc':
         'Computer Science student managing our social media presence, content creation, and promotional materials to increase club visibility.',
       'designer-name': 'Yahya ennayri',
-      'designer-role': 'Designer',
+      'designer-role': 'Designer & media manager',
       'designer-desc':
-        "Physics student with a creative flair. Develops visual materials, event decorations, and maintains the club's aesthetic identity across all platforms.",
+        "Computer Science student bache student with a creative flair. Develops visual materials, event decorations, and maintains the club's aesthetic identity across all platforms.",
       'language-cells-title': 'Language Cells Chiefs',
       'language-cells-desc':
         'Our language specialists who ensure excellence in multilingual debates and help members develop proficiency in different languages.',
@@ -485,7 +485,7 @@ const ALL_TRANSLATIONS = {
       'french-chief-name': 'Abdel ali rejdali',
       'french-chief-role': 'French Cell Chief',
       'french-chief-desc':
-        'Industrial Engineering student fluent in French. Organizes French debate sessions and helps members master the nuances of argumentation in French.',
+        '  Economics student fluent in French. Organizes French debate sessions and helps members master the nuances of argumentation in French.',
       'french-cert': 'DALF C1 Certified',
       'join-team-title': 'Want to Join Our Team?',
       'join-team-desc':
