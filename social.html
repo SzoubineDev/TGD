@@ -383,7 +383,7 @@
 
           // Increased size limit since we're using Base64
           // Increased size limit since we're using Base64
-          if (file.size > 5 * 1024 * 1024) {
+          if (file.size > 15 * 1024 * 1024) {
             alert('Please select an image smaller than 5MB for better performance');
             input.value = '';
             return;
