@@ -170,14 +170,12 @@
       function previewImage(input) {
         const file = input.files[0];
         if (file) {
-          // Validate file type
           if (!file.type.startsWith('image/')) {
             alert('Please select an image file');
             input.value = '';
             return;
           }
 
-          // Validate file size (max 2MB for faster uploads)
           if (file.size > 2 * 1024 * 1024) {
             alert('For faster uploads, please select an image smaller than 2MB');
             input.value = '';
@@ -192,7 +190,6 @@
             document.getElementById('imagePreview').classList.remove('hidden');
             document.getElementById('fileName').textContent = file.name;
 
-            // Show file size
             const fileSize = (file.size / 1024 / 1024).toFixed(2);
             document.getElementById('fileSize').textContent = `${fileSize} MB`;
           };
@@ -217,7 +214,6 @@
           const img = new Image();
 
           img.onload = function () {
-            // Calculate new dimensions
             let width = img.width;
             let height = img.height;
 
@@ -229,7 +225,6 @@
             canvas.width = width;
             canvas.height = height;
 
-            // Draw and compress
             ctx.drawImage(img, 0, 0, width, height);
             canvas.toBlob(resolve, 'image/jpeg', quality);
           };
@@ -241,27 +236,22 @@
       // Upload image to Firebase Storage with progress
       async function uploadImage(file) {
         try {
-          // Show progress bar
           document.getElementById('uploadProgress').classList.remove('hidden');
 
-          // Compress image first (for files > 500KB)
           let imageToUpload = file;
           if (file.size > 500 * 1024) {
             imageToUpload = await compressImage(file);
           }
 
-          // Create a unique filename
           const fileName = `posts/${currentUser.uid}/${Date.now()}.jpg`;
           const storageRef = storage.ref().child(fileName);
 
-          // Upload with progress tracking
           const uploadTask = storageRef.put(imageToUpload);
 
           return new Promise((resolve, reject) => {
             uploadTask.on(
               'state_changed',
               snapshot => {
-                // Update progress
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                 document.getElementById('progressBar').style.width = progress + '%';
                 document.getElementById('progressPercent').textContent = Math.round(progress) + '%';
@@ -271,7 +261,6 @@
                 reject(error);
               },
               async () => {
-                // Upload complete
                 document.getElementById('uploadProgress').classList.add('hidden');
                 const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
                 resolve(downloadURL);
@@ -398,13 +387,13 @@
                                     <div class="flex space-x-6">
                                         <button onclick="toggleLike('${postId}')" class="flex items-center space-x-2 ${
             userLiked.exists ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
-          }">
-                                            <i class="fas fa-heart ${
-                                              userLiked.exists ? 'fas' : 'far'
-                                            }"></i>
-                                            <span>${likesCount}</span>
+          } transition-colors duration-200">
+                                            <i class="${
+                                              userLiked.exists ? 'fas text-red-500' : 'far'
+                                            } fa-heart"></i>
+                                            <span class="like-count">${likesCount}</span>
                                         </button>
-                                        <button onclick="toggleComments('${postId}')" class="flex items-center space-x-2 text-gray-400 hover:text-blue-400">
+                                        <button onclick="toggleComments('${postId}')" class="flex items-center space-x-2 text-gray-400 hover:text-blue-400 transition-colors duration-200">
                                             <i class="far fa-comment"></i>
                                             <span>${commentsSnapshot.size}</span>
                                         </button>
@@ -455,7 +444,7 @@
         if (modal) modal.remove();
       }
 
-      // Toggle like
+      // Toggle like - UPDATED TO NOT RELOAD PAGE
       async function toggleLike(postId) {
         if (!currentUser) return;
 
@@ -467,16 +456,42 @@
             .doc(currentUser.uid);
           const likeDoc = await likeRef.get();
 
+          // Find the like button and count for this post
+          const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+          const likeButton = postElement.querySelector('button[onclick*="toggleLike"]');
+          const likeIcon = likeButton.querySelector('i');
+          const likeCount = likeButton.querySelector('.like-count');
+
           if (likeDoc.exists) {
+            // Unlike - remove from Firebase
             await likeRef.delete();
+
+            // Update UI instantly
+            likeIcon.classList.remove('fas', 'text-red-500');
+            likeIcon.classList.add('far');
+            likeButton.classList.remove('text-red-500');
+            likeButton.classList.add('text-gray-400', 'hover:text-red-500');
+
+            // Update count
+            const currentCount = parseInt(likeCount.textContent);
+            likeCount.textContent = currentCount - 1;
           } else {
+            // Like - add to Firebase
             await likeRef.set({
               userId: currentUser.uid,
               likedAt: new Date(),
             });
-          }
 
-          loadPosts();
+            // Update UI instantly
+            likeIcon.classList.remove('far');
+            likeIcon.classList.add('fas', 'text-red-500');
+            likeButton.classList.remove('text-gray-400', 'hover:text-red-500');
+            likeButton.classList.add('text-red-500');
+
+            // Update count
+            const currentCount = parseInt(likeCount.textContent);
+            likeCount.textContent = currentCount + 1;
+          }
         } catch (error) {
           console.error('❌ Error toggling like:', error);
         }
@@ -488,7 +503,7 @@
         commentsSection.classList.toggle('hidden');
       }
 
-      // Add comment
+      // Add comment - UPDATED TO NOT RELOAD PAGE
       async function addComment(postId) {
         const commentInput = document.getElementById(`commentInput-${postId}`);
         const content = commentInput.value.trim();
@@ -496,6 +511,7 @@
         if (!content || !currentUser) return;
 
         try {
+          // Add comment to Firebase
           await db
             .collection('posts')
             .doc(postId)
@@ -507,10 +523,51 @@
               createdAt: new Date(),
             });
 
+          // Clear input
           commentInput.value = '';
-          loadPosts();
+
+          // Update comments section without reloading
+          await updateCommentsSection(postId);
         } catch (error) {
           console.error('❌ Error adding comment:', error);
+        }
+      }
+
+      // Update comments section without reloading entire page
+      async function updateCommentsSection(postId) {
+        try {
+          const commentsSnapshot = await db
+            .collection('posts')
+            .doc(postId)
+            .collection('comments')
+            .orderBy('createdAt', 'asc')
+            .get();
+
+          const commentsHtml = commentsSnapshot.docs
+            .map(commentDoc => {
+              const comment = commentDoc.data();
+              return `
+                        <div class="bg-gray-700 rounded-lg p-3 mb-2">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="font-semibold text-blue-400">${
+                                  comment.authorName
+                                }</span>
+                                <span class="text-xs text-gray-400">${formatTime(
+                                  comment.createdAt?.toDate()
+                                )}</span>
+                            </div>
+                            <p class="text-gray-300 text-sm">${comment.content}</p>
+                        </div>
+                    `;
+            })
+            .join('');
+
+          const commentsSection = document.getElementById(`comments-${postId}`);
+          const commentsContainer = commentsSection.querySelector('.space-y-2');
+          commentsContainer.innerHTML =
+            commentsHtml || '<p class="text-gray-400 text-sm">No comments yet</p>';
+        } catch (error) {
+          console.error('❌ Error updating comments:', error);
         }
       }
 
@@ -545,12 +602,10 @@
         try {
           let imageUrl = null;
 
-          // Upload image if selected
           if (selectedImageFile) {
             imageUrl = await uploadImage(selectedImageFile);
           }
 
-          // Create post immediately (don't wait for image if it's taking too long)
           await db.collection('posts').add({
             content: content,
             authorId: currentUser.uid,
@@ -560,7 +615,7 @@
           });
 
           closeCreatePost();
-          loadPosts();
+          loadPosts(); // Only reload here for new posts
         } catch (error) {
           console.error('❌ Error creating post:', error);
           alert('Error creating post. Please try again.');
