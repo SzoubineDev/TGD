@@ -15,149 +15,302 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   </head>
-  <body class="min-h-screen flex items-center justify-center p-4 bg-gray-800">
-    <div class="max-w-md w-full">
-      <!-- Header -->
-      <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-white mb-2">The Great Debaters</h1>
-        <p class="text-gray-300">Master the Art of Persuasion</p>
+  <body class="min-h-screen bg-gray-800">
+    <!-- Welcome Message (Hidden by default) -->
+    <div
+      id="welcomeMessage"
+      class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden"
+    >
+      <div class="bg-gray-700 rounded-lg p-8 max-w-md mx-4 text-center">
+        <div class="text-6xl mb-4">🎉</div>
+        <h2 class="text-2xl font-bold text-white mb-4">Welcome to The Great Debaters!</h2>
+        <p class="text-gray-300 mb-6">You're now part of our community of critical thinkers</p>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
       </div>
+    </div>
 
-      <!-- Form Container -->
-      <div class="bg-gray-700 rounded-lg shadow-xl p-8">
-        <div class="text-center mb-6">
-          <h2 class="text-2xl font-bold text-white mb-2">Become a Member</h2>
-          <p class="text-gray-400">Join our community of critical thinkers</p>
+    <!-- Login Form -->
+    <div id="loginForm" class="min-h-screen flex items-center justify-center p-4">
+      <div class="max-w-md w-full">
+        <!-- Header -->
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-bold text-white mb-2">The Great Debaters</h1>
+          <p class="text-gray-300">Master the Art of Persuasion</p>
         </div>
 
-        <!-- Registration Form -->
-        <form id="registrationForm" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Full Name *</label>
-            <input
-              type="text"
-              id="fullName"
-              class="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
-              placeholder="Enter your full name"
-              required
-            />
+        <!-- Form Container -->
+        <div class="bg-gray-700 rounded-lg shadow-xl p-8">
+          <div class="text-center mb-6">
+            <h2 class="text-2xl font-bold text-white mb-2">Become a Member</h2>
+            <p class="text-gray-400">Join our community of critical thinkers</p>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Email *</label>
-            <input
-              type="email"
-              id="email"
-              class="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
+          <!-- Registration Form -->
+          <form id="registrationForm" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">Full Name *</label>
+              <input
+                type="text"
+                id="fullName"
+                class="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                placeholder="Enter your full name"
+                required
+              />
+            </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Phone Number *</label>
-            <input
-              type="tel"
-              id="phone"
-              class="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
-              placeholder="Enter your phone number"
-              required
-            />
-          </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">Email *</label>
+              <input
+                type="email"
+                id="email"
+                class="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Specialty *</label>
-            <select
-              id="specialty"
-              class="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-              required
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">Phone Number *</label>
+              <input
+                type="tel"
+                id="phone"
+                class="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                placeholder="Enter your phone number"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">Specialty *</label>
+              <select
+                id="specialty"
+                class="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                required
+              >
+                <option value="" disabled selected>Select your specialty</option>
+                <option value="DEUST">DEUST</option>
+                <option value="LICENSE">LICENSE</option>
+                <option value="CYCLE D'Ingenieur">CYCLE D'Ingenieur</option>
+                <option value="Master">Master</option>
+                <option value="Doctorat">Doctorat</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1"
+                >How did you hear about us? *</label
+              >
+              <select
+                id="referralSource"
+                class="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                required
+              >
+                <option value="" disabled selected>Select an option</option>
+                <option value="Friend">Friend</option>
+                <option value="Facebook">Facebook</option>
+                <option value="Instagram">Instagram</option>
+                <option value="Twitter">Twitter</option>
+                <option value="LinkedIn">LinkedIn</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div id="otherSourceField" class="hidden">
+              <label class="block text-sm font-medium text-gray-300 mb-1">Please specify</label>
+              <input
+                type="text"
+                id="otherSource"
+                class="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                placeholder="Please specify"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">Password *</label>
+              <input
+                type="password"
+                id="password"
+                class="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                placeholder="Create a password"
+                required
+              />
+            </div>
+
+            <div class="flex items-center">
+              <input type="checkbox" id="terms" class="mr-2" required />
+              <label for="terms" class="text-sm text-gray-300">
+                I agree to the Terms of Service and Privacy Policy
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              id="submitButton"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition-colors disabled:opacity-50"
             >
-              <option value="" disabled selected>Select your specialty</option>
-              <option value="DEUST">DEUST</option>
-              <option value="LICENSE">LICENSE</option>
-              <option value="CYCLE D'Ingenieur">CYCLE D'Ingenieur</option>
-              <option value="Master">Master</option>
-              <option value="Doctorat">Doctorat</option>
-            </select>
-          </div>
+              Become a Member
+            </button>
+          </form>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1"
-              >How did you hear about us? *</label
-            >
-            <select
-              id="referralSource"
-              class="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-              required
-            >
-              <option value="" disabled selected>Select an option</option>
-              <option value="Friend">Friend</option>
-              <option value="Facebook">Facebook</option>
-              <option value="Instagram">Instagram</option>
-              <option value="Twitter">Twitter</option>
-              <option value="LinkedIn">LinkedIn</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div id="otherSourceField" class="hidden">
-            <label class="block text-sm font-medium text-gray-300 mb-1">Please specify</label>
-            <input
-              type="text"
-              id="otherSource"
-              class="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
-              placeholder="Please specify"
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Password *</label>
-            <input
-              type="password"
-              id="password"
-              class="w-full bg-gray-600 border border-gray-500 rounded px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
-              placeholder="Create a password"
-              required
-            />
-          </div>
-
-          <div class="flex items-center">
-            <input type="checkbox" id="terms" class="mr-2" required />
-            <label for="terms" class="text-sm text-gray-300">
-              I agree to the Terms of Service and Privacy Policy
-            </label>
+          <div class="flex items-center my-6">
+            <div class="flex-1 border-t border-gray-600"></div>
+            <div class="px-3 text-gray-400 text-sm">OR</div>
+            <div class="flex-1 border-t border-gray-600"></div>
           </div>
 
           <button
-            type="submit"
-            id="submitButton"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition-colors disabled:opacity-50"
+            id="googleSignIn"
+            class="w-full bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 rounded flex items-center justify-center space-x-2 border border-gray-300"
           >
-            Become a Member
+            <i class="fab fa-google text-red-500"></i>
+            <span>Continue with Google</span>
           </button>
-        </form>
 
-        <div class="flex items-center my-6">
-          <div class="flex-1 border-t border-gray-600"></div>
-          <div class="px-3 text-gray-400 text-sm">OR</div>
-          <div class="flex-1 border-t border-gray-600"></div>
+          <div class="text-center mt-6">
+            <p class="text-gray-400">
+              Already a member?
+              <button id="toggleLogin" class="text-blue-400 hover:text-blue-300 font-medium">
+                Sign In
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Media Feed (Hidden by default) -->
+    <div id="socialFeed" class="hidden">
+      <!-- Navigation -->
+      <nav class="bg-gray-900 border-b border-gray-700">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+          <h1 class="text-xl font-bold text-white">The Great Debaters</h1>
+          <div class="flex items-center space-x-4">
+            <span class="text-gray-300" id="userWelcome">Welcome!</span>
+            <button onclick="logout()" class="text-gray-400 hover:text-white">Logout</button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Posts Feed -->
+      <div class="max-w-2xl mx-auto p-4 space-y-6">
+        <!-- Post 1 -->
+        <div class="bg-gray-700 rounded-lg shadow-lg">
+          <div class="p-4">
+            <div class="flex items-center space-x-3 mb-3">
+              <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                <span class="text-white font-bold">GD</span>
+              </div>
+              <div>
+                <h3 class="text-white font-semibold">The Great Debaters</h3>
+                <p class="text-gray-400 text-sm">2 hours ago</p>
+              </div>
+            </div>
+            <p class="text-gray-300 mb-4">
+              "The art of persuasion lies not in speaking, but in being heard. Join our weekly
+              debate on climate change policies this Friday!"
+            </p>
+            <img
+              src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+              alt="Debate session"
+              class="w-full rounded-lg mb-4"
+            />
+          </div>
+          <div class="border-t border-gray-600 px-4 py-3">
+            <div class="flex space-x-6">
+              <button class="flex items-center space-x-2 text-gray-400 hover:text-red-500">
+                <i class="far fa-heart"></i>
+                <span>Like</span>
+              </button>
+              <button class="flex items-center space-x-2 text-gray-400 hover:text-blue-400">
+                <i class="far fa-comment"></i>
+                <span>Comment</span>
+              </button>
+              <button class="flex items-center space-x-2 text-gray-400 hover:text-green-400">
+                <i class="far fa-share-square"></i>
+                <span>Share</span>
+              </button>
+            </div>
+          </div>
         </div>
 
-        <button
-          id="googleSignIn"
-          class="w-full bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 rounded flex items-center justify-center space-x-2 border border-gray-300"
-        >
-          <i class="fab fa-google text-red-500"></i>
-          <span>Continue with Google</span>
-        </button>
+        <!-- Post 2 -->
+        <div class="bg-gray-700 rounded-lg shadow-lg">
+          <div class="p-4">
+            <div class="flex items-center space-x-3 mb-3">
+              <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                <span class="text-white font-bold">DT</span>
+              </div>
+              <div>
+                <h3 class="text-white font-semibold">Debate Team</h3>
+                <p class="text-gray-400 text-sm">5 hours ago</p>
+              </div>
+            </div>
+            <p class="text-gray-300 mb-4">
+              "Critical thinking is the foundation of effective debate. Practice your skills with
+              our new argument structure workshop!"
+            </p>
+            <img
+              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+              alt="Workshop"
+              class="w-full rounded-lg mb-4"
+            />
+          </div>
+          <div class="border-t border-gray-600 px-4 py-3">
+            <div class="flex space-x-6">
+              <button class="flex items-center space-x-2 text-gray-400 hover:text-red-500">
+                <i class="far fa-heart"></i>
+                <span>Like</span>
+              </button>
+              <button class="flex items-center space-x-2 text-gray-400 hover:text-blue-400">
+                <i class="far fa-comment"></i>
+                <span>Comment</span>
+              </button>
+              <button class="flex items-center space-x-2 text-gray-400 hover:text-green-400">
+                <i class="far fa-share-square"></i>
+                <span>Share</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
-        <div class="text-center mt-6">
-          <p class="text-gray-400">
-            Already a member?
-            <button id="toggleLogin" class="text-blue-400 hover:text-blue-300 font-medium">
-              Sign In
-            </button>
-          </p>
+        <!-- Post 3 -->
+        <div class="bg-gray-700 rounded-lg shadow-lg">
+          <div class="p-4">
+            <div class="flex items-center space-x-3 mb-3">
+              <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+                <span class="text-white font-bold">EC</span>
+              </div>
+              <div>
+                <h3 class="text-white font-semibold">Events Committee</h3>
+                <p class="text-gray-400 text-sm">1 day ago</p>
+              </div>
+            </div>
+            <p class="text-gray-300 mb-4">
+              "Our inter-university debate competition starts next month! Register now to showcase
+              your persuasive skills and win amazing prizes."
+            </p>
+            <img
+              src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+              alt="Competition"
+              class="w-full rounded-lg mb-4"
+            />
+          </div>
+          <div class="border-t border-gray-600 px-4 py-3">
+            <div class="flex space-x-6">
+              <button class="flex items-center space-x-2 text-gray-400 hover:text-red-500">
+                <i class="far fa-heart"></i>
+                <span>Like</span>
+              </button>
+              <button class="flex items-center space-x-2 text-gray-400 hover:text-blue-400">
+                <i class="far fa-comment"></i>
+                <span>Comment</span>
+              </button>
+              <button class="flex items-center space-x-2 text-gray-400 hover:text-green-400">
+                <i class="far fa-share-square"></i>
+                <span>Share</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -189,6 +342,10 @@
       const googleSignIn = document.getElementById('googleSignIn');
       const referralSource = document.getElementById('referralSource');
       const otherSourceField = document.getElementById('otherSourceField');
+      const welcomeMessage = document.getElementById('welcomeMessage');
+      const loginForm = document.getElementById('loginForm');
+      const socialFeed = document.getElementById('socialFeed');
+      const userWelcome = document.getElementById('userWelcome');
 
       // Show/hide other source field
       referralSource.addEventListener('change', function () {
@@ -198,6 +355,18 @@
           otherSourceField.classList.add('hidden');
         }
       });
+
+      // Show welcome message and redirect
+      function showWelcomeAndRedirect(user) {
+        welcomeMessage.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+
+        setTimeout(() => {
+          welcomeMessage.classList.add('hidden');
+          socialFeed.classList.remove('hidden');
+          userWelcome.textContent = `Welcome, ${user.displayName || user.email.split('@')[0]}!`;
+        }, 3000);
+      }
 
       // Form Submission
       registrationForm.addEventListener('submit', async e => {
@@ -227,6 +396,11 @@
           const userCredential = await auth.createUserWithEmailAndPassword(email, password);
           const user = userCredential.user;
 
+          // Update user profile with display name
+          await user.updateProfile({
+            displayName: fullName,
+          });
+
           await db.collection('members').doc(user.uid).set({
             fullName: fullName,
             email: email,
@@ -237,7 +411,7 @@
             uid: user.uid,
           });
 
-          alert('Account created successfully! Welcome to The Great Debaters!');
+          showWelcomeAndRedirect(user);
           registrationForm.reset();
           otherSourceField.classList.add('hidden');
         } catch (error) {
@@ -290,10 +464,9 @@
                 uid: user.uid,
                 isGoogleUser: true,
               });
-            alert('Account created successfully! Welcome!');
-          } else {
-            alert('Successfully signed in! Welcome back!');
           }
+
+          showWelcomeAndRedirect(user);
         } catch (error) {
           console.error('Google sign in error:', error);
           alert('Google Sign-In is not configured yet');
@@ -301,6 +474,36 @@
           googleSignIn.disabled = false;
           googleSignIn.innerHTML =
             '<i class="fab fa-google text-red-500"></i><span>Continue with Google</span>';
+        }
+      });
+
+      // Logout function
+      function logout() {
+        auth.signOut().then(() => {
+          socialFeed.classList.add('hidden');
+          loginForm.classList.remove('hidden');
+          welcomeMessage.classList.add('hidden');
+        });
+      }
+
+      // Check if user is already logged in
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          showWelcomeAndRedirect(user);
+        }
+      });
+
+      // Like button functionality
+      document.addEventListener('click', function (e) {
+        if (e.target.closest('.fa-heart')) {
+          const heart = e.target.closest('.fa-heart');
+          if (heart.classList.contains('far')) {
+            heart.classList.remove('far');
+            heart.classList.add('fas', 'text-red-500');
+          } else {
+            heart.classList.remove('fas', 'text-red-500');
+            heart.classList.add('far');
+          }
         }
       });
     </script>
