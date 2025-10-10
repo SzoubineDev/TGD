@@ -382,8 +382,9 @@
           }
 
           // Increased size limit since we're using Base64
-          if (file.size > 3 * 1024 * 1024) {
-            alert('Please select an image smaller than 3MB for better performance');
+          // Increased size limit since we're using Base64
+          if (file.size > 5 * 1024 * 1024) {
+            alert('Please select an image smaller than 5MB for better performance');
             input.value = '';
             return;
           }
