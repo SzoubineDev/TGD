@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Great Debaters - Join Our Community</title>
+    <title>Join The Great Debaters</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
@@ -16,13 +16,12 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   </head>
   <body class="min-h-screen bg-gray-800">
-    <!-- Welcome Message (Hidden by default) -->
+    <!-- Welcome Message -->
     <div
       id="welcomeMessage"
       class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden"
     >
       <div class="bg-gray-700 rounded-lg p-8 max-w-md mx-4 text-center">
-        <div class="text-6xl mb-4">🎉</div>
         <h2 class="text-2xl font-bold text-white mb-4">Welcome to The Great Debaters!</h2>
         <p class="text-gray-300 mb-6">You're now part of our community of critical thinkers</p>
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
@@ -178,143 +177,6 @@
       </div>
     </div>
 
-    <!-- Social Media Feed (Hidden by default) -->
-    <div id="socialFeed" class="hidden">
-      <!-- Navigation -->
-      <nav class="bg-gray-900 border-b border-gray-700">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-          <h1 class="text-xl font-bold text-white">The Great Debaters</h1>
-          <div class="flex items-center space-x-4">
-            <span class="text-gray-300" id="userWelcome">Welcome!</span>
-            <button onclick="logout()" class="text-gray-400 hover:text-white">Logout</button>
-          </div>
-        </div>
-      </nav>
-
-      <!-- Posts Feed -->
-      <div class="max-w-2xl mx-auto p-4 space-y-6">
-        <!-- Post 1 -->
-        <div class="bg-gray-700 rounded-lg shadow-lg">
-          <div class="p-4">
-            <div class="flex items-center space-x-3 mb-3">
-              <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                <span class="text-white font-bold">GD</span>
-              </div>
-              <div>
-                <h3 class="text-white font-semibold">The Great Debaters</h3>
-                <p class="text-gray-400 text-sm">2 hours ago</p>
-              </div>
-            </div>
-            <p class="text-gray-300 mb-4">
-              "The art of persuasion lies not in speaking, but in being heard. Join our weekly
-              debate on climate change policies this Friday!"
-            </p>
-            <img
-              src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-              alt="Debate session"
-              class="w-full rounded-lg mb-4"
-            />
-          </div>
-          <div class="border-t border-gray-600 px-4 py-3">
-            <div class="flex space-x-6">
-              <button class="flex items-center space-x-2 text-gray-400 hover:text-red-500">
-                <i class="far fa-heart"></i>
-                <span>Like</span>
-              </button>
-              <button class="flex items-center space-x-2 text-gray-400 hover:text-blue-400">
-                <i class="far fa-comment"></i>
-                <span>Comment</span>
-              </button>
-              <button class="flex items-center space-x-2 text-gray-400 hover:text-green-400">
-                <i class="far fa-share-square"></i>
-                <span>Share</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Post 2 -->
-        <div class="bg-gray-700 rounded-lg shadow-lg">
-          <div class="p-4">
-            <div class="flex items-center space-x-3 mb-3">
-              <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                <span class="text-white font-bold">DT</span>
-              </div>
-              <div>
-                <h3 class="text-white font-semibold">Debate Team</h3>
-                <p class="text-gray-400 text-sm">5 hours ago</p>
-              </div>
-            </div>
-            <p class="text-gray-300 mb-4">
-              "Critical thinking is the foundation of effective debate. Practice your skills with
-              our new argument structure workshop!"
-            </p>
-            <img
-              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-              alt="Workshop"
-              class="w-full rounded-lg mb-4"
-            />
-          </div>
-          <div class="border-t border-gray-600 px-4 py-3">
-            <div class="flex space-x-6">
-              <button class="flex items-center space-x-2 text-gray-400 hover:text-red-500">
-                <i class="far fa-heart"></i>
-                <span>Like</span>
-              </button>
-              <button class="flex items-center space-x-2 text-gray-400 hover:text-blue-400">
-                <i class="far fa-comment"></i>
-                <span>Comment</span>
-              </button>
-              <button class="flex items-center space-x-2 text-gray-400 hover:text-green-400">
-                <i class="far fa-share-square"></i>
-                <span>Share</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Post 3 -->
-        <div class="bg-gray-700 rounded-lg shadow-lg">
-          <div class="p-4">
-            <div class="flex items-center space-x-3 mb-3">
-              <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
-                <span class="text-white font-bold">EC</span>
-              </div>
-              <div>
-                <h3 class="text-white font-semibold">Events Committee</h3>
-                <p class="text-gray-400 text-sm">1 day ago</p>
-              </div>
-            </div>
-            <p class="text-gray-300 mb-4">
-              "Our inter-university debate competition starts next month! Register now to showcase
-              your persuasive skills and win amazing prizes."
-            </p>
-            <img
-              src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-              alt="Competition"
-              class="w-full rounded-lg mb-4"
-            />
-          </div>
-          <div class="border-t border-gray-600 px-4 py-3">
-            <div class="flex space-x-6">
-              <button class="flex items-center space-x-2 text-gray-400 hover:text-red-500">
-                <i class="far fa-heart"></i>
-                <span>Like</span>
-              </button>
-              <button class="flex items-center space-x-2 text-gray-400 hover:text-blue-400">
-                <i class="far fa-comment"></i>
-                <span>Comment</span>
-              </button>
-              <button class="flex items-center space-x-2 text-gray-400 hover:text-green-400">
-                <i class="far fa-share-square"></i>
-                <span>Share</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <script>
       // Firebase Configuration
       const firebaseConfig = {
@@ -344,8 +206,6 @@
       const otherSourceField = document.getElementById('otherSourceField');
       const welcomeMessage = document.getElementById('welcomeMessage');
       const loginForm = document.getElementById('loginForm');
-      const socialFeed = document.getElementById('socialFeed');
-      const userWelcome = document.getElementById('userWelcome');
 
       // Show/hide other source field
       referralSource.addEventListener('change', function () {
@@ -362,10 +222,8 @@
         loginForm.classList.add('hidden');
 
         setTimeout(() => {
-          welcomeMessage.classList.add('hidden');
-          socialFeed.classList.remove('hidden');
-          userWelcome.textContent = `Welcome, ${user.displayName || user.email.split('@')[0]}!`;
-        }, 3000);
+          window.location.href = 'social.html';
+        }, 2000);
       }
 
       // Form Submission
@@ -477,33 +335,10 @@
         }
       });
 
-      // Logout function
-      function logout() {
-        auth.signOut().then(() => {
-          socialFeed.classList.add('hidden');
-          loginForm.classList.remove('hidden');
-          welcomeMessage.classList.add('hidden');
-        });
-      }
-
       // Check if user is already logged in
       auth.onAuthStateChanged(user => {
         if (user) {
-          showWelcomeAndRedirect(user);
-        }
-      });
-
-      // Like button functionality
-      document.addEventListener('click', function (e) {
-        if (e.target.closest('.fa-heart')) {
-          const heart = e.target.closest('.fa-heart');
-          if (heart.classList.contains('far')) {
-            heart.classList.remove('far');
-            heart.classList.add('fas', 'text-red-500');
-          } else {
-            heart.classList.remove('fas', 'text-red-500');
-            heart.classList.add('far');
-          }
+          window.location.href = 'social.html';
         }
       });
     </script>
