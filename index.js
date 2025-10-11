@@ -518,7 +518,7 @@ const ALL_TRANSLATIONS = {
       'hr-manager-role': 'Responsable RH',
       'hr-manager-desc':
         "Étudiant en mathématiques axé sur le recrutement des membres, la fidélisation et l'organisation d'activités de renforcement d'équipe pour maintenir la cohésion du club.",
-      'event-manager-name': 'Nouhaila Sghiri',
+      'event-manager-name': 'Nohaila Sghiri',
       'event-manager-role': 'Responsable Événements',
       'event-manager-desc':
         'Étudiante en génie financier avec des compétences exceptionnelles en planification. Coordonne tous les événements du club, des réunions hebdomadaires aux tournois majeurs et compétitions interuniversitaires.',
@@ -546,7 +546,7 @@ const ALL_TRANSLATIONS = {
       'french-chief-name': 'Abdel ali rejdali',
       'french-chief-role': 'Chef de Cellule Française',
       'french-chief-desc':
-        "Étudiant en génie industriel fluent en français. Organise les sessions de débat en français et aide les membres à maîtriser les nuances de l'argumentation en français.",
+        "Étudiant en economie fluent en français. Organise les sessions de débat en français et aide les membres à maîtriser les nuances de l'argumentation en français.",
       'french-cert': 'Certifié DALF C1',
       'join-team-title': 'Voulez-vous Rejoindre Notre Équipe?',
       'join-team-desc':
@@ -563,7 +563,7 @@ const ALL_TRANSLATIONS = {
       'president-role': 'الرئيسة',
       'president-desc':
         'طالبة هندسة كيمياء شغوفة بالخطاب الاجتماعي . تقود الرؤية الاستراتيجية للنادي وتمثل المتحدثين الكبار في الفعاليات الجامعية.',
-      'vice-president-name': 'زبين سليمان',
+      'vice-president-name': ' الزوبين سليمان',
       'vice-president-role': 'نائب الرئيس',
       'vice-president-desc':
         'طالب بكالوريوس هندسة برمجيات. ينسق أنشطة النادي ويدعم الرئيسة في التخطيط الاستراتيجي واتخاذ القرارات.',
